@@ -1,0 +1,53 @@
+import 'package:test/test.dart';
+
+import 'array_test.dart' as array_test;
+import 'attribute_test.dart' as attribute_test;
+import 'chain_test.dart' as chain_test;
+import 'comment_test.dart' as comment_test;
+import 'core_test.dart' as core_test;
+import 'each_test.dart' as each_test;
+import 'extra_test.dart' as extra_test;
+import 'for_test.dart' as for_test;
+import 'function_test.dart' as function_test;
+import 'if_test.dart' as if_test;
+import 'literal_test.dart' as literal_test;
+import 'loop_test.dart' as loop_test;
+import 'match_test.dart' as match_test;
+import 'meta_test.dart' as meta_test;
+import 'namespace_test.dart' as namespace_test;
+import 'object_test.dart' as object_test;
+import 'operator_test.dart' as operator_test;
+import 'primitive_props_test.dart' as primitive_props_test;
+import 'return_test.dart' as return_test;
+import 'stdlib_test.dart' as stdlib_test;
+import 'template_test.dart' as template_test;
+import 'type_test.dart' as type_test;
+import 'unicode_test.dart' as unicode_test;
+import 'variable_test.dart' as variable_test;
+
+void main() {
+  group('array', array_test.main);
+  group('attribute', attribute_test.main);
+  group('chain', chain_test.main);
+  group('comment', comment_test.main);
+  group('core', core_test.main);
+  group('each', each_test.main);
+  group('extra', extra_test.main);
+  group('for', for_test.main);
+  group('function', function_test.main);
+  group('if', if_test.main);
+  group('literal', literal_test.main);
+  group('loop', loop_test.main);
+  group('match', match_test.main);
+  group('meta', meta_test.main);
+  group('namespace', namespace_test.main);
+  group('object', object_test.main);
+  group('operator', operator_test.main);
+  group('primitive', primitive_props_test.main);
+  group('return', return_test.main);
+  group('stdlib', stdlib_test.main);
+  group('template', template_test.main);
+  group('type', type_test.main);
+  group('unicode', unicode_test.main);
+  group('variable', variable_test.main);
+}
