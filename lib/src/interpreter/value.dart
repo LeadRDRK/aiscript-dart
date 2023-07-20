@@ -4,13 +4,19 @@ import 'scope.dart';
 import '../core/node.dart';
 import '../core/error.dart';
 
+/// Origin statement of a value.
 enum OriginStatement {
+  /// The value was not returned using any statement.
   none,
+  /// The value was returned using the 'return' statement.
   return_,
+  /// The value was returned using the 'break' statement.
   break_,
+  /// The value was returned using the 'continue' statement.
   continue_
 }
 
+/// An AiScript value.
 abstract class Value {
   Value([this.origin = OriginStatement.none]);
 

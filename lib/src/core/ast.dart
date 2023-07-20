@@ -8,7 +8,8 @@ class NamespaceNode extends Node with NameProp {
 
   @override
   String name;
-  List<Node> members; // (DefinitionNode | NamespaceNode)[]
+  /// (DefinitionNode | NamespaceNode)[]
+  List<Node> members;
 
   @override
   void accept(Visitor fn) {
@@ -37,8 +38,10 @@ class DefinitionNode extends Node with NameProp {
 
   @override
   String name;
-  Node? varType; // NamedTypeSourceNode | FnTypeSourceNode
-  Node expr; // Expression
+  /// NamedTypeSourceNode | FnTypeSourceNode
+  Node? varType;
+  /// Expression
+  Node expr;
   bool mut;
   List<AttributeNode> attr;
 
@@ -56,7 +59,8 @@ class AttributeNode extends Node with NameProp {
 
   @override
   String name;
-  Node value; // Expression
+  /// Expression
+  Node value;
 }
 
 class ReturnNode extends Node {
@@ -65,7 +69,8 @@ class ReturnNode extends Node {
   @override
   String get type => 'return';
 
-  Node expr; // Expression
+  /// Expression
+  Node expr;
 
   @override
   void accept(Visitor fn) {
@@ -80,8 +85,10 @@ class EachNode extends Node {
   String get type => 'each';
 
   String varName;
-  Node items; // Expression
-  Node body; // Statement | Expression
+  /// Expression
+  Node items;
+  /// Statement | Expression
+  Node body;
 
   @override
   void accept(Visitor fn) {
@@ -97,10 +104,14 @@ class ForNode extends Node {
   String get type => 'for';
 
   String? varName;
-  Node? from; // Expression
-  Node? to; // Expression
-  Node? times; // Expression
-  Node body; // Statement | Expression
+  /// Expression
+  Node? from;
+  /// Expression
+  Node? to;
+  /// Expression
+  Node? times;
+  /// Statement | Expression
+  Node body;
 
   @override
   void accept(Visitor fn) {
@@ -117,7 +128,8 @@ class LoopNode extends Node {
   @override
   String get type => 'loop';
 
-  List<Node> statements; // (Statement | Expression)[]
+  /// (Statement | Expression)[]
+  List<Node> statements;
 
   @override
   void accept(Visitor fn) {
@@ -144,8 +156,10 @@ class ContinueNode extends Node {
 abstract class BaseAssignNode extends Node {
   BaseAssignNode(this.dest, this.expr, Loc? loc) : super(loc);
 
-  Node dest; // Expression
-  Node expr; // Expression
+  /// Expression
+  Node dest;
+  /// Expression
+  Node expr;
 
   @override
   void accept(Visitor fn) {
@@ -181,7 +195,8 @@ class NotNode extends Node {
   @override
   String get type => 'not';
 
-  Node expr; // Expression
+  /// Expression
+  Node expr;
 
   @override
   void accept(Visitor fn) {
@@ -192,8 +207,10 @@ class NotNode extends Node {
 class ElseifBlock {
   ElseifBlock(this.cond, this.then);
 
-  Node cond; // Expression
-  Node then; // Statement | Expression
+  /// Expression
+  Node cond;
+  /// Statement | Expression
+  Node then;
 }
 
 class IfNode extends Node {
@@ -202,10 +219,13 @@ class IfNode extends Node {
   @override
   String get type => 'if';
 
-  Node cond; // Expression
-  Node then; // Statement | Expression
+  /// Expression
+  Node cond;
+  /// Statement | Expression
+  Node then;
   List<ElseifBlock> elseifBlocks;
-  Node? elseBlock; // Statement | Expression
+  /// Statement | Expression
+  Node? elseBlock;
 
   @override
   void accept(Visitor fn) {
@@ -223,7 +243,8 @@ class FnParam {
   FnParam(this.name, this.paramType);
 
   String name;
-  Node? paramType; // NamedTypeSourceNode | FnTypeSourceNode
+  /// NamedTypeSourceNode | FnTypeSourceNode
+  Node? paramType;
 }
 
 class FnNode extends Node {
@@ -233,8 +254,10 @@ class FnNode extends Node {
   String get type => 'fn';
 
   List<FnParam> params;
-  Node? retType; // NamedTypeSourceNode | FnTypeSourceNode
-  List<Node> children; // (Statement | Expression)[]
+  /// NamedTypeSourceNode | FnTypeSourceNode
+  Node? retType;
+  /// (Statement | Expression)[]
+  List<Node> children;
 
   @override
   void accept(Visitor fn) {
@@ -247,8 +270,10 @@ class FnNode extends Node {
 class MatchCase {
   MatchCase(this.q, this.a);
 
-  Node q; // Expression
-  Node a; // Statement | Expression
+  /// Expression
+  Node q;
+  /// Statement | Expression
+  Node a;
 }
 
 class MatchNode extends Node {
@@ -257,7 +282,8 @@ class MatchNode extends Node {
   @override
   String get type => 'match';
 
-  Node about; // Expression
+  /// Expression
+  Node about;
   List<MatchCase> qs;
   Node? defaultRes;
 
@@ -278,7 +304,8 @@ class BlockNode extends Node {
   @override
   String get type => 'block';
 
-  List<Node> statements; // (Statement | Expression)[]
+  /// (Statement | Expression)[]
+  List<Node> statements;
 
   @override
   void accept(Visitor fn) {
@@ -294,7 +321,8 @@ class TmplNode extends Node {
   @override
   String get type => 'tmpl';
 
-  List<dynamic> tmpl; // (string | Expression)[]
+  /// (String | Expression)[]
+  List<dynamic> tmpl;
 
   @override
   void accept(Visitor fn) {
@@ -347,7 +375,8 @@ class ObjNode extends Node {
   @override
   String get type => 'obj';
 
-  Map<String, Node> value; // Node as Expression
+  /// Map<String, Expression>
+  Map<String, Node> value;
 
   @override
   void accept(Visitor fn) {
@@ -361,7 +390,8 @@ class ArrNode extends Node {
   @override
   String get type => 'arr';
 
-  List<Node> value; // Expression[]
+  /// Expression[]
+  List<Node> value;
 
   @override
   void accept(Visitor fn) {
@@ -387,8 +417,10 @@ class CallNode extends Node {
   @override
   String get type => 'call';
 
-  Node target; // Expression
-  List<Node> args; // Expression[]
+  /// Expression
+  Node target;
+  /// Expression[]
+  List<Node> args;
 
   @override
   void accept(Visitor fn) {
@@ -405,8 +437,10 @@ class IndexNode extends Node {
   @override
   String get type => 'index';
 
-  Node target; // Expression
-  Node index; // Expression
+  /// Expression
+  Node target;
+  /// Expression
+  Node index;
 
   @override
   void accept(Visitor fn) {
@@ -421,7 +455,8 @@ class PropNode extends Node {
   @override
   String get type => 'prop';
 
-  Node target; // Expression
+  /// Expression
+  Node target;
   String name;
 
   @override
@@ -437,7 +472,8 @@ class NamedTypeSourceNode extends Node {
   String get type => 'namedTypeSource';
 
   String name;
-  Node? inner; // NamedTypeSourceNode | FnTypeSourceNode
+  /// NamedTypeSourceNode | FnTypeSourceNode
+  Node? inner;
 }
 
 class FnTypeSourceNode extends Node {
@@ -446,6 +482,8 @@ class FnTypeSourceNode extends Node {
   @override
   String get type => 'fnTypeSource';
 
-  List<Node> args; // (NamedTypeSourceNode | FnTypeSourceNode)[]
-  Node result; // NamedTypeSourceNode | FnTypeSourceNode
+  /// (NamedTypeSourceNode | FnTypeSourceNode)[]
+  List<Node> args;
+  /// NamedTypeSourceNode | FnTypeSourceNode
+  Node result;
 }

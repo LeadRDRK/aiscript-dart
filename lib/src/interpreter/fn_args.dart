@@ -2,10 +2,15 @@ import 'dart:collection';
 import 'value.dart';
 import '../core/error.dart';
 
+/// The arguments to be passed to a function.
 class FnArgs extends ListBase<Value> {
   final List<Value> _l;
   const FnArgs(this._l);
 
+  /// Checks if an argument has the intended type.
+  /// 
+  /// Throws a TypeError if the value cannot be casted to
+  /// the desired type.
   T check<T extends Value>(int i) {
     assert(T != Never);
     final v = _l.elementAtOrNull(i);

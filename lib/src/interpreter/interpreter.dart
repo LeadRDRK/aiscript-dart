@@ -43,6 +43,12 @@ class Interpreter {
   bool _aborted = false;
   final List<void Function()> _abortHandlers = [];
 
+  /// Creates a new interpreter state.
+  /// 
+  /// The global scope will be initialized with the variable in vars,
+  /// along with other default variables.
+  /// By default, print() and readline() will not do anything. Provide
+  /// an implementation in printFn and readlineFn to make them work.
   Interpreter(Map<String, Value> vars, {
     this.printFn,
     this.readlineFn,

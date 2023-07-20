@@ -2,6 +2,7 @@ import 'dart:collection';
 import 'value.dart';
 import '../core/error.dart';
 
+/// An AiScript scope.
 class Scope extends MapBase<String, Value> {
   Scope(this._layers, [String? name, this.parent])
   : name = name ?? (_layers.length == 1 ? '<root>' : '<anonymous>');
@@ -9,8 +10,11 @@ class Scope extends MapBase<String, Value> {
   factory Scope.child(Scope parent, [Map<String, Value>? states, String? name]) =>
       Scope([states ?? {}, ...parent._layers], name, parent);
 
+  /// The parent scope.
   Scope? parent;
+  /// The state layers. Contains states from its ancestors.
   final List<Map<String, Value>> _layers;
+  /// The scope's name.
   String name;
 
   @override
