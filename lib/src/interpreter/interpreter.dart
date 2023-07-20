@@ -365,19 +365,10 @@ class Interpreter {
   }
 
   Value _passArgValue(Value arg) {
-    switch (arg.type) {
-      case 'str': arg as StrValue;
-        return StrValue(arg.value);
-      
-      case 'bool': arg as BoolValue;
-        return BoolValue(arg.value);
-
-      case 'num': arg as NumValue;
-        return NumValue(arg.value);
-      
-      default:
-        return arg;
+    if (arg is NumValue) {
+      return NumValue(arg.value);
     }
+    return arg;
   }
 
   /// Calls the function.
@@ -385,10 +376,10 @@ class Interpreter {
   /// The optional loc value will be used for errors.
   /// If defined, error objects will include the location where the call occurred.
   Future<Value> call(FnValue fn, [List<Value> args = const [], Loc? loc]) async {
-    final passedArgs = args.map((value) => _passArgValue(value)).toList();
+    final passedArgs = args.map((value) => _passArgValue(value));
     if (fn is NativeFnValue) {
       try {
-        return await fn.nativeFn(FnArgs(passedArgs), this);
+        return await fn.nativeFn(FnArgs(passedArgs.toList()), this);
       }
       catch (e) {
         if (e is AiScriptError) {
