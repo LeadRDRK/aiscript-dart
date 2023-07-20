@@ -124,11 +124,29 @@ void main() {
   });
 
   group('Json', () {
-		test('stringify: fn', () async {
+    test('stringify', () async {
 			final res = await exec('''
-			  <: Json:stringify(@(){})
+			  <: Json:stringify({
+          a: 'hoge'
+          b: 21
+          c: true
+          arr: [1, 2, 3]
+          fn: @(){}
+        })
 			''');
-			expect(res, StrValue('"<function>"'));
+			expect(res, StrValue('{"a":"hoge","b":21,"c":true,"arr":[1,2,3],"fn":"<function>"}'));
+		});
+
+    test('parse', () async {
+			final res = await exec('''
+			  <: Json:parse('{"a":"hoge","b":21,"c":true,"arr":[1,2,3]}')
+			''');
+			expect(res, HasValue({
+        'a': StrValue('hoge'),
+        'b': NumValue(21),
+        'c': BoolValue(true),
+        'arr': HasValue([NumValue(1), NumValue(2), NumValue(3)])
+      }));
 		});
   });
 

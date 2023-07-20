@@ -43,11 +43,11 @@ abstract class Value {
   }
 
   factory Value.fromJson(dynamic v) {
-    if (v == null)     return NullValue();
-    if (v is bool)     return BoolValue(v);
-    if (v is num)      return NumValue(v);
-    if (v is String)   return StrValue(v);
-    if (v is Iterable) return ArrValue.fromJson(v);
+    if (v == null)   return NullValue();
+    if (v is bool)   return BoolValue(v);
+    if (v is num)    return NumValue(v);
+    if (v is String) return StrValue(v);
+    if (v is List)   return ArrValue.fromJson(v);
     if (v is Map<String, dynamic>) return ObjValue.fromJson(v);
     
     return NullValue();
@@ -153,11 +153,11 @@ class ArrValue extends Value with PrimitiveValue<List<Value>>, DeepEqValue {
   @override
   final List<Value> value;
 
-  ArrValue.fromJson(Iterable iterable)
-  : value = iterable.map((e) => Value.fromJson(e)).toList();
+  ArrValue.fromJson(List list)
+  : value = list.map((e) => Value.fromJson(e)).toList();
 
   @override
-  Iterable<dynamic> toJson() => value.map((e) => e.toJson());
+  List<dynamic> toJson() => value.map((e) => e.toJson()).toList();
 
   @override
   bool deepEq(Value other) {
