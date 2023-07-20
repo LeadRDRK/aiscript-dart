@@ -1,0 +1,40 @@
+name: Dart
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/cache@v3
+        with:
+          path: "~/.pub-cache/hosted"
+          key: "os:ubuntu-latest;pub-cache-hosted;dart:stable"
+
+      - uses: actions/checkout@v3
+
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - name: "Dependencies"
+        run: dart pub get
+
+      - name: "Analyzer"
+        run: dart analyze --fatal-infos .
+
+      - name: "Tests"
+        run: dart test test/all_test.dart
+
+      - name: "Collect coverage"
+        run: |
+          dart pub global activate coverage
+          dart pub global run coverage:test_with_coverage --test test/all_test.dart
+
+      - name: "Upload coverage"
+        uses: codecov/codecov-action@v3
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
