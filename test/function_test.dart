@@ -127,5 +127,22 @@ void main() {
       ''');
       expect(res, NumValue(1));
     });
+
+    test('num arg value is copied (native fn)', () async {
+      final vars = {
+        'f': NativeFnValue((args, state) async {
+          final hoge = args.check<NumValue>(0);
+          hoge.value = 2;
+          return NullValue();
+        })
+      };
+
+      final res = await exec('''
+        var hoge = 1
+        f(hoge)
+        <: hoge
+      ''', vars);
+      expect(res, NumValue(1));
+    });
   });
 }

@@ -2,13 +2,13 @@ import 'dart:async';
 import 'package:aiscript/aiscript.dart';
 import 'package:test/test.dart';
 
-Future<Value> exec(String program) {
+Future<Value> exec(String program, [Map<String, Value>? vars]) {
   final completer = Completer<Value>();
 
   final parser = Parser();
   final res = parser.parse(program);
 
-  final state = Interpreter({},
+  final state = Interpreter(vars ?? {},
     printFn: (v) => completer.complete(v),
     maxStep: 9999
   );
