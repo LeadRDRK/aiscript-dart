@@ -32,4 +32,16 @@ void main() {
 		''');
 		expect(res, HasValue([StrValue('murakami'), StrValue('san'), NullValue(), StrValue('kawaii')]));
   });
+
+  test('deepEq', () async {
+    final res = await exec('''
+      <: ["murakami", "san", "kawaii", [1, 2, 3]]
+		''');
+    expect(res, predicate((v) => (v as ArrValue).deepEq(
+      ArrValue([
+        StrValue('murakami'), StrValue('san'), StrValue('kawaii'),
+        ArrValue([NumValue(1), NumValue(2), NumValue(3)])
+      ])
+    )));
+  });
 }

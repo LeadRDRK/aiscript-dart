@@ -62,4 +62,30 @@ void main() {
       })
     }));
 	});
+
+  test('deepEq', () async {
+    final res = await exec('''
+      let obj = {
+        a: 1
+        b: {
+          c: 2
+          d: {
+            e: 3
+          }
+        }
+      }
+      <: obj
+		''');
+    expect(res, predicate((v) => (v as ObjValue).deepEq(
+      ObjValue({
+        'a': NumValue(1),
+        'b': ObjValue({
+          'c': NumValue(2),
+          'd': ObjValue({
+            'e': NumValue(3),
+          })
+        })
+      })
+    )));
+  });
 }
