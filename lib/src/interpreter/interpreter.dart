@@ -364,24 +364,31 @@ class Interpreter {
     return LineColumn.fromList(Token.lineAndColumnOf(source!, loc.start));
   }
 
-  Value _passArgValue(Value? arg) {
-    if (arg == null) return NullValue();
+  Value _passArgValue(Value arg) {
+    switch (arg.type) {
+      case 'str': arg as StrValue;
+        return StrValue(arg.value);
+      
+      case 'bool': arg as BoolValue;
+        return BoolValue(arg.value);
 
-    if (arg is NumValue) {
-      return NumValue(arg.value);
+      case 'num': arg as NumValue;
+        return NumValue(arg.value);
+      
+      default:
+        return arg;
     }
-    
-    return arg;
   }
 
   /// Calls the function.
   /// 
   /// The optional loc value will be used for errors.
   /// If defined, error objects will include the location where the call occurred.
-  Future<Value> call(FnValue fn, [FnArgs args = const FnArgs([]), Loc? loc]) async {
+  Future<Value> call(FnValue fn, [List<Value> args = const [], Loc? loc]) async {
+    final passedArgs = args.map((value) => _passArgValue(value)).toList();
     if (fn is NativeFnValue) {
       try {
-        return await fn.nativeFn(args, this);
+        return await fn.nativeFn(FnArgs(passedArgs), this);
       }
       catch (e) {
         if (e is AiScriptError) {
@@ -394,7 +401,7 @@ class Interpreter {
       fn as NormalFnValue;
       final Map<String, Value> argVars = {};
       for (var i = 0; i < fn.params.length; ++i) {
-        argVars[fn.params[i]] = _passArgValue(args.elementAtOrNull(i));
+        argVars[fn.params[i]] = passedArgs.elementAtOrNull(i) ?? NullValue();
       }
       final scope = Scope.child(fn.scope, argVars);
       return _run(fn.statements, scope);
