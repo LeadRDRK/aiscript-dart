@@ -1,4 +1,9 @@
 # AiScript for Dart
+
+[![pub.dev](https://img.shields.io/pub/v/aiscript.svg)](https://pub.dev/packages/aiscript)
+[![build](https://github.com/LeadRDRK/aiscript-dart/actions/workflows/dart.yml/badge.svg)](https://github.com/LeadRDRK/aiscript-dart/actions/workflows/dart.yml)
+[![codecov](https://codecov.io/gh/LeadRDRK/aiscript-dart/branch/main/graph/badge.svg?token=DPVQPA9XOB)](https://codecov.io/gh/LeadRDRK/aiscript-dart)
+
 AiScript parser and interpreter for Dart. Based on the reference implementation ([syuilo/aiscript](https://github.com/syuilo/aiscript)). This library has a very similar API to the original.
 
 AiScript is a lightweight scripting language that was designed to run on top of JavaScript. For more information, check out the original repo's [Getting started guide](https://github.com/syuilo/aiscript/blob/master/docs/get-started.md) ([en](https://github.com/syuilo/aiscript/blob/master/translations/en/docs/get-started.md))
