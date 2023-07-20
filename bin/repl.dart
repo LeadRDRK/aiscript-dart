@@ -39,7 +39,7 @@ Type "help" for more information.
         print('Failed to read from stdin');
         return;
       }
-      script += line;
+      script += '$line\n';
 
       var clMatch = clRegex.firstMatch(line);
       if (clMatch != null) {
