@@ -14,10 +14,10 @@ This package also contains a command line REPL program in `bin/repl.dart`
 - Null safety: All functions must return a Value object. If a function doesn't need to return a value, it must still return a NullValue object.
 
 # API reference
-View on [pub.dev](https://pub.dev/documentation/aiscript/latest/)
+[View on pub.dev](https://pub.dev/documentation/aiscript/latest/)
 
 # Examples
-See [`/example`](/example)
+See [`/example`](https://github.com/LeadRDRK/aiscript-dart/tree/main/example)
 
 # License
 [MIT](LICENSE)

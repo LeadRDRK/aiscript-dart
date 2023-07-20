@@ -1,5 +1,5 @@
 name: aiscript
-description: AiScript parser and interpreter for Dart.
+description: Parser and interpreter for AiScript, a lightweight scripting language, written in Dart.
 version: 0.1.0
 repository: https://github.com/LeadRDRK/aiscript-dart
 
