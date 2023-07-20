@@ -12,6 +12,7 @@ This package also contains a command line REPL program in `bin/repl.dart`
 ### Non-standard behaviors
 - Out of range array assignments are allowed for now. Empty spots will be filled with null values.
 - Null safety: All functions must return a Value object. If a function doesn't need to return a value, it must still return a NullValue object.
+- Number values are passed to functions as a copy. Other types of values are marked as final and cannot be changed once initialized.
 
 # API reference
 [View on pub.dev](https://pub.dev/documentation/aiscript/latest/)
