@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:aiscript/aiscript.dart';
 import 'package:test/test.dart';
 
-Future<Value> exec(String program, [Map<String, Value>? vars, bool? runTimers]) async {
+Future<Value> exec(String program, {Map<String, Value>? vars, bool? runTimers}) async {
   final completer = Completer<Value>();
 
   final parser = Parser();

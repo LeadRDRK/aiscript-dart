@@ -141,7 +141,7 @@ void main() {
         var hoge = 1
         f(hoge)
         <: hoge
-      ''', vars);
+      ''', vars: vars);
       expect(res, NumValue(1));
     });
   });
