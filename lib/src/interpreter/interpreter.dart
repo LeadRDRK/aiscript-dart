@@ -438,11 +438,13 @@ class Interpreter {
     return meta;
   }
 
+  /// Runs the Async timers.
   Future<void> runTimers() async {
     await Future.wait(_timerFutures);
     _timerFutures.clear();
   }
 
+  /// Adds a future for a timer.
   void addTimerFuture(Future<void> future) {
     _timerFutures.add(future);
   }
