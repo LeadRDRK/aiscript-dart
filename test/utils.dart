@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:aiscript/aiscript.dart';
 import 'package:test/test.dart';
 
-Future<Value> exec(String program, [Map<String, Value>? vars]) {
+Future<Value> exec(String program, [Map<String, Value>? vars, bool? runTimers]) async {
   final completer = Completer<Value>();
 
   final parser = Parser();
@@ -19,7 +19,14 @@ Future<Value> exec(String program, [Map<String, Value>? vars]) {
     return NullValue();
   });
 
-  return completer.future;
+  if (runTimers == true) {
+    final res = await completer.future;
+    await state.runTimers();
+    return res;
+  }
+  else {
+    return completer.future;
+  }
 }
 
 Map<String, dynamic> getMeta(String program) {

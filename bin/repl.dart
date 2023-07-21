@@ -59,6 +59,7 @@ Type "help" for more information.
       ParseResult res = parser.parse(script);
       state.source = res.source;
       print(await state.exec(res.ast));
+      await state.runTimers();
     }
     catch (e) {
       print(e);

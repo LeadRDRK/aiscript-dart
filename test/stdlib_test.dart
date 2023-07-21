@@ -12,6 +12,10 @@ void main() {
       expect(await exec('<: Core:range(1, 1)'), HasValue([NumValue(1)]));
       expect(await exec('<: Core:range(9, 7)'), HasValue([NumValue(9), NumValue(8), NumValue(7)]));
     });
+
+    test('not', () async {
+      expect(await exec('<: Core:not(false)'), BoolValue(true));
+    });
   });
 
   group('Math', () {
@@ -152,5 +156,38 @@ void main() {
 
   test('throw error when required arg missing', () async {
     expect(() async => await exec('<: Core:eq(1)'), throwsA(TypeMatcher<TypeError>()));
+  });
+
+  group('Async', () {
+    test('timeout', () async {
+      var prevTime = DateTime.now().millisecondsSinceEpoch;
+      final res = await exec('''
+        Async:timeout(1000, @() {
+          <: true
+        })
+      ''');
+
+      int duration = DateTime.now().millisecondsSinceEpoch - prevTime;
+      expect(res, BoolValue(true));
+      expect(duration, greaterThanOrEqualTo(1000));
+    });
+
+    test('interval', () async {
+      var prevTime = DateTime.now().millisecondsSinceEpoch;
+      final res = await exec('''
+        var count = 0
+        let cancel = Async:interval(500, @() {
+          count += 1
+          if (count == 3) {
+            cancel()
+            <: true
+          }
+        })
+      ''');
+
+      int duration = DateTime.now().millisecondsSinceEpoch - prevTime;
+      expect(res, BoolValue(true));
+      expect(duration, greaterThanOrEqualTo(1500));
+    });
   });
 }
