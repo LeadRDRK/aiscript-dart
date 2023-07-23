@@ -211,6 +211,12 @@ abstract class BaseOpNode extends Node {
   Node left;
   /// Expression
   Node right;
+
+  @override
+  void accept(Visitor fn) {
+    left = left.visit(fn);
+    right = right.visit(fn);
+  }
 }
 
 class AndNode extends BaseOpNode {
