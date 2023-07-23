@@ -42,6 +42,11 @@ abstract class Value {
     }
   }
 
+  /// Sets the origin statement to none
+  void clearOrigin() {
+    origin = OriginStatement.none;
+  }
+
   factory Value.fromJson(dynamic v) {
     if (v == null)   return NullValue();
     if (v is bool)   return BoolValue(v);

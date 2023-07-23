@@ -1,13 +1,24 @@
 import 'package:aiscript/aiscript.dart';
 
-class _OpInfo {
-  _OpInfo(this.func, this.priority);
-
-  final String func;
+abstract class _BaseOpInfo {
+  _BaseOpInfo(this.priority);
+  
   final int priority;
 }
 
-final Map<String, _OpInfo> _opInfos = {
+class _OpInfo extends _BaseOpInfo {
+  _OpInfo(this.func, int priority) : super(priority);
+
+  final String func;
+}
+
+class _ConstructOpInfo extends _BaseOpInfo {
+  _ConstructOpInfo({required this.constructor, required int priority}) : super(priority);
+
+  final Node Function(_InfixTreeNode infix) constructor;
+}
+
+final Map<String, _BaseOpInfo> _opInfos = {
   '*':  _OpInfo('Core:mul',  7),
   '^':  _OpInfo('Core:pow',  7),
   '/':  _OpInfo('Core:div',  7),
@@ -20,8 +31,22 @@ final Map<String, _OpInfo> _opInfos = {
   '>':  _OpInfo('Core:gt',   4),
   '<=': _OpInfo('Core:lteq', 4),
   '>=': _OpInfo('Core:gteq', 4),
-  '&&': _OpInfo('Core:and',  3),
-  '||': _OpInfo('Core:or',   2)
+  '&&': _ConstructOpInfo(
+    constructor: (infix) =>
+      AndNode(
+        left: _infixTreeToNode(infix.left),
+        right: _infixTreeToNode(infix.right)
+      ),
+    priority: 3
+  ),
+  '||': _ConstructOpInfo(
+    constructor: (infix) =>
+      OrNode(
+        left: _infixTreeToNode(infix.left),
+        right: _infixTreeToNode(infix.right)
+      ),
+    priority: 3
+  ),
 };
 
 class _InfixTreeNode extends Node {
@@ -32,10 +57,10 @@ class _InfixTreeNode extends Node {
 
   Node left;
   Node right;
-  _OpInfo info;
+  _BaseOpInfo info;
 }
 
-_InfixTreeNode _insertInfixTree(Node curTree, Node nextTree, _OpInfo nextInfo) {
+_InfixTreeNode _insertInfixTree(Node curTree, Node nextTree, _BaseOpInfo nextInfo) {
   if (curTree.type != 'infixTree') {
     return _InfixTreeNode(curTree, nextTree, nextInfo);
   }
@@ -55,10 +80,17 @@ Node _infixTreeToNode(Node tree) {
   }
 
   tree as _InfixTreeNode;
-  return CallNode(
-    target: IdentifierNode(name: tree.info.func),
-    args: [_infixTreeToNode(tree.left), _infixTreeToNode(tree.right)]
-  );
+  final info = tree.info;
+  if (info is _ConstructOpInfo) {
+    return info.constructor(tree);
+  }
+  else {
+    info as _OpInfo;
+    return CallNode(
+      target: IdentifierNode(name: info.func),
+      args: [_infixTreeToNode(tree.left), _infixTreeToNode(tree.right)]
+    );
+  }
 }
 
 Node _transform(InfixNode node, LineColumnFn getLineColumn) {

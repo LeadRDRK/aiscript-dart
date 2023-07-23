@@ -20,6 +20,30 @@ void main() {
     expect(await exec('<: false && false'), BoolValue(false));
     expect(await exec('<: false && null'), BoolValue(false));
     expect(() async => await exec('<: true && null'), throwsA(TypeMatcher<TypeError>()));
+    expect(
+      await exec('''
+        var tmp = null
+				@func() {
+					tmp = true
+					return true
+				}
+				false && func()
+				<: tmp
+      '''),
+      NullValue()
+    );
+    expect(
+      await exec('''
+        var tmp = null
+				@func() {
+					tmp = true
+					return true
+				}
+				true && func()
+				<: tmp
+      '''),
+      BoolValue(true)
+    );
   });
 
   test('||', () async {
@@ -29,6 +53,30 @@ void main() {
     expect(await exec('<: false || false'), BoolValue(false));
     expect(await exec('<: true || null'), BoolValue(true));
     expect(() async => await exec('<: false || null'), throwsA(TypeMatcher<TypeError>()));
+    expect(
+      await exec('''
+        var tmp = null
+				@func() {
+					tmp = true
+					return true
+				}
+				true || func()
+				<: tmp
+      '''),
+      NullValue()
+    );
+    expect(
+      await exec('''
+        var tmp = null
+				@func() {
+					tmp = true
+					return true
+				}
+				false || func()
+				<: tmp
+      '''),
+      BoolValue(true)
+    );
   });
 
   test('+', () async {

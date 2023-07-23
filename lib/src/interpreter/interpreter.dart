@@ -315,6 +315,26 @@ class Interpreter {
       case 'meta': node as MetaNode;
         // nop
         return NullValue();
+      
+      case 'and': node as AndNode;
+        final left = (await _eval(node.left, scope)).cast<BoolValue>();
+        if (!left.value) {
+          return left..clearOrigin();
+        }
+        else {
+          final right = (await _eval(node.right, scope)).cast<BoolValue>();
+          return right..clearOrigin();
+        }
+      
+      case 'or': node as OrNode;
+        final left = (await _eval(node.left, scope)).cast<BoolValue>();
+        if (left.value) {
+          return left..clearOrigin();
+        }
+        else {
+          final right = (await _eval(node.right, scope)).cast<BoolValue>();
+          return right..clearOrigin();
+        }
 
       default:
         throw RuntimeError('invalid node type: ${node.type}', _lineColumn(node.loc));

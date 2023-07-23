@@ -204,6 +204,29 @@ class NotNode extends Node {
   }
 }
 
+abstract class BaseOpNode extends Node {
+  BaseOpNode(this.left, this.right, Loc? loc) : super(loc);
+
+  /// Expression
+  Node left;
+  /// Expression
+  Node right;
+}
+
+class AndNode extends BaseOpNode {
+  AndNode({required Node left, required Node right, Loc? loc}) : super(left, right, loc);
+
+  @override
+  String get type => 'and';
+}
+
+class OrNode extends BaseOpNode  {
+  OrNode({required Node left, required Node right, Loc? loc}) : super(left, right, loc);
+
+  @override
+  String get type => 'or';
+}
+
 class ElseifBlock {
   ElseifBlock(this.cond, this.then);
 
