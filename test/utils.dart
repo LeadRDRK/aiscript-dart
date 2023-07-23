@@ -14,7 +14,6 @@ Future<Value> exec(String program, {Map<String, Value>? vars, bool? runTimers}) 
   );
   state.source = res.source;
   state.exec(res.ast).catchError((error) {
-    print(error);
     completer.completeError(error);
     return NullValue();
   });
