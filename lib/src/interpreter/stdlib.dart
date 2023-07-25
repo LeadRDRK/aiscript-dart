@@ -37,7 +37,7 @@ final Map<String, Value> stdlib = {
    * Core
    */
 
-  'Core:v': StrValue('0.14.0'),
+  'Core:v': StrValue('0.15.0'),
 
   'Core:ai': StrValue('kawaii'),
 
