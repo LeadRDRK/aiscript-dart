@@ -21,6 +21,9 @@ This package also contains a command line REPL program in `bin/repl.dart`
 - Number values are passed to functions as a copy. Other types of values are marked as final and cannot be changed once initialized.
 - Async functions (timeout, interval) will not run the timers on their own due to how Dart works. You must await for `Interpreter.runTimers()` after `Interpreter.exec()` has finished so that the timers would run.
 
+### Extra
+The interpreter uses a package called [`es6_math`](https://pub.dev/packages/es6_math) to implement some of the math functions. The native version of the library will be used if available. If you use its `loadEs6MathLibrary` function to load the native library, the interpreter will use the native implementation instead, which might result in slightly better performance.
+
 # API reference
 [View on pub.dev](https://pub.dev/documentation/aiscript/latest/)
 
