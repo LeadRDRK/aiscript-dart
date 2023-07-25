@@ -143,13 +143,7 @@ final Map<String, Value> stdlib = {
 
   'Core:to_str': NativeFnValue((args, __) async {
     final v = args.check<Value>(0);
-    if (v is StrValue) {
-      return v;
-    }
-    else if (v is NumValue) {
-      return StrValue(v.value.toString());
-    }
-    return StrValue('?');
+    return StrValue(v.toString());
   }),
 
   'Core:range': NativeFnValue((args, __) async {

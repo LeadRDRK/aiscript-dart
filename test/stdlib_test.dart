@@ -18,6 +18,27 @@ void main() {
     test('not', () async {
       expect(await exec('<: Core:not(false)'), BoolValue(true));
     });
+
+    test('to_str', () async {
+			expect(await exec('<: Core:to_str("abc")'), StrValue('abc'));
+			expect(await exec('<: Core:to_str(123)'), StrValue('123'));
+			expect(await exec('<: Core:to_str(true)'), StrValue('true'));
+			expect(await exec('<: Core:to_str(false)'), StrValue('false'));
+			expect(await exec('<: Core:to_str(null)'), StrValue('null'));
+			expect(await exec('<: Core:to_str({ a: "abc", b: 1234 })'), StrValue('{ a: "abc", b: 1234 }'));
+			expect(await exec('<: Core:to_str([ true, "abc", 123, null ])'), StrValue('[ true, "abc", 123, null ]'));
+			expect(await exec('<: Core:to_str(@( a, b, c ) {})'), StrValue('@( a, b, c ) { ... }'));
+			expect(await exec('''
+				let arr = []
+				arr.push(arr)
+				<: Core:to_str(arr)
+			'''), StrValue('[ ... ]'));
+			expect(await exec('''
+				let arr = []
+				arr.push({ value: arr })
+				<: Core:to_str(arr)
+			'''), StrValue('[ { value: ... } ]'));
+		});
   });
 
   group('Math', () {

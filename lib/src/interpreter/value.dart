@@ -87,14 +87,16 @@ class Attribute {
 }
 
 /// An AiScript null value.
-class NullValue extends Value with PrimitiveValue<void> {
+// ignore: prefer_void_to_null
+class NullValue extends Value with PrimitiveValue<Null> {
   NullValue([origin = OriginStatement.none]) : super(origin);
 
   @override
   String get type => 'null';
 
   @override
-  void value;
+  // ignore: prefer_void_to_null
+  final Null value = null;
 
   @override
   void toJson() {}
@@ -140,12 +142,18 @@ class StrValue extends Value with PrimitiveValue<String> {
 
   @override
   String toJson() => value;
+
+  @override
+  String toString([bool literalLike = false]) => literalLike ? '"$value"' : value;
 }
 
 mixin DeepEqValue<T> on PrimitiveValue<T> {
   /// Checks if a value deeply equals to another.
   /// Intended for array and object values.
   bool deepEq(Value other);
+
+  @override
+  String toString([Set<DeepEqValue>? processed]);
 }
 
 /// An AiScript arr value.
@@ -163,6 +171,26 @@ class ArrValue extends Value with PrimitiveValue<List<Value>>, DeepEqValue {
 
   @override
   List<dynamic> toJson() => value.map((e) => e.toJson()).toList();
+
+  @override
+  String toString([Set<DeepEqValue>? processed]) {
+    processed ??= {};
+    if (processed.contains(this)) return '...';
+    processed.add(this);
+
+    final List<String> content = [];
+    for (final v in value) {
+      if (v == this) {
+        content.add('...');
+        continue;
+      }
+      content.add(
+          v is StrValue ? v.toString(true) :
+          v is DeepEqValue ? v.toString(processed) : v.toString()
+      );
+    }
+    return '[ ${content.join(', ')} ]';
+  }
 
   @override
   bool deepEq(Value other) {
@@ -198,6 +226,24 @@ class ObjValue extends Value with PrimitiveValue<Map<String, Value>>, DeepEqValu
       value.map((key, value) => MapEntry(key, value.toJson()));
   
   @override
+  String toString([Set<DeepEqValue>? processed]) {
+    processed ??= {};
+    if (processed.contains(this)) return '...';
+    processed.add(this);
+
+    final List<String> content = [];
+    for (final k in value.keys) {
+      final v = value[k]!;
+      final str = (
+          v is StrValue ? v.toString(true) :
+          v is DeepEqValue ? v.toString(processed) : v.toString()
+      );
+      content.add('$k: $str');
+    }
+    return '{ ${content.join(', ')} }';
+  }
+
+  @override
   bool deepEq(Value other) {
     if (other is! ObjValue || value.length != other.value.length) return false;
     for (final k in value.keys) {
@@ -232,7 +278,7 @@ abstract class FnValue extends Value {
   String toJson() => '<function>';
 
   @override
-  String toString() => 'fn<...>';
+  String toString() => '@( ${params != null ? params!.join(", ") : ""} ) { ... }';
 }
 
 /// A native fn value.
