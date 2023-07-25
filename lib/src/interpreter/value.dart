@@ -166,12 +166,14 @@ class ArrValue extends Value with PrimitiveValue<List<Value>>, DeepEqValue {
 
   @override
   bool deepEq(Value other) {
-    if (other is! ArrValue) return false;
+    if (other is! ArrValue || value.length != other.value.length) return false;
     for (var i = 0; i < value.length; ++i) {
       final v = value[i];
-      final equals = (v is DeepEqValue) ?
-          v.deepEq(other.value[i]) :
-          v == other.value[i];
+      final otherValue = other.value[i];
+
+      final equals = (v is DeepEqValue && v != this) ?
+          v.deepEq(otherValue) :
+          v == otherValue;
       if (!equals) return false;
     }
     return true;
@@ -197,14 +199,15 @@ class ObjValue extends Value with PrimitiveValue<Map<String, Value>>, DeepEqValu
   
   @override
   bool deepEq(Value other) {
-    if (other is! ObjValue) return false;
+    if (other is! ObjValue || value.length != other.value.length) return false;
     for (final k in value.keys) {
+      final v = value[k]!;
       final otherValue = other.value[k];
       if (otherValue == null) return false;
 
-      final equals = (otherValue is DeepEqValue) ?
-          otherValue.deepEq(value[k]!) :
-          otherValue == value[k];
+      final equals = (v is DeepEqValue && v != this) ?
+          v.deepEq(otherValue) :
+          v == otherValue;
       if (!equals) return false;
     }
     return true;

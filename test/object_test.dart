@@ -76,6 +76,9 @@ void main() {
       }
       <: obj
 		''');
+
+    res as ObjValue;
+    res.value['f'] = res;
     expect(res, predicate((v) => (v as ObjValue).deepEq(
       ObjValue({
         'a': NumValue(1),
@@ -84,7 +87,8 @@ void main() {
           'd': ObjValue({
             'e': NumValue(3),
           })
-        })
+        }),
+        'f': res
       })
     )));
   });

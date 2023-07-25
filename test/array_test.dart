@@ -37,10 +37,13 @@ void main() {
     final res = await exec('''
       <: ["murakami", "san", "kawaii", [1, 2, 3]]
 		''');
+    
+    res as ArrValue;
+    res.value.add(res);
     expect(res, predicate((v) => (v as ArrValue).deepEq(
       ArrValue([
         StrValue('murakami'), StrValue('san'), StrValue('kawaii'),
-        ArrValue([NumValue(1), NumValue(2), NumValue(3)])
+        ArrValue([NumValue(1), NumValue(2), NumValue(3)]), res
       ])
     )));
   });
