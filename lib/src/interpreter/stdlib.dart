@@ -2,8 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 import 'package:uuid/uuid.dart';
-import 'package:es6_math/es6_math.dart'
-    if (dart.library.ffi) 'package:es6_math/es6_math_native.dart';
+import 'package:es6_math/es6_math.dart';
 
 import '../core/error.dart';
 import 'value.dart';
