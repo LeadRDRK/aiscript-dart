@@ -41,6 +41,12 @@ void main() {
 		});
   });
 
+  group('Date', () {
+    test('parse', () async {
+      expect(await exec('<: Date:parse("1995-12-17T03:24:00")'), NumValue(819145440000));
+    });
+  });
+
   group('Math', () {
     test('trig', () async {
       expect(await exec('<: Math:sin(Math:PI / 2)'), NumValue(1));
@@ -258,6 +264,11 @@ void main() {
         'arr': HasValue([NumValue(1), NumValue(2), NumValue(3)])
       }));
 		});
+
+    test('parsable', () async {
+      expect(await exec('<: Json:parsable("{ \\"abc\\": 123 }")'), BoolValue(true));
+      expect(await exec('<: Json:parsable("hoge")'), BoolValue(false));
+    });
   });
 
   test('throw error when required arg missing', () async {
