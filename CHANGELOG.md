@@ -1,3 +1,10 @@
+# 0.4.0
+- `Core:v` = `0.15.0`
+- `Core:to_str` now allows any type of value.
+- Added more math functions and constants.
+- Implemented and/or operators short-circuiting.
+- Fixed stack overflow in `DeepEqValue.deepEq`.
+
 # 0.3.0
 - Added `Interpreter.addTimerFuture()` and `Interpreter.runTimers()`
 - Properly implemented Async functions (timeout, interval). Note that to run the timer of these functions, you must await for `Interpreter.runTimers()`
