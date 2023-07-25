@@ -150,7 +150,7 @@ class StrValue extends Value with PrimitiveValue<String> {
 mixin DeepEqValue<T> on PrimitiveValue<T> {
   /// Checks if a value deeply equals to another.
   /// Intended for array and object values.
-  bool deepEq(Value other);
+  bool deepEq(Value other, [Set<DeepEqValue>? processed]);
 
   @override
   String toString([Set<DeepEqValue>? processed]);
@@ -193,14 +193,18 @@ class ArrValue extends Value with PrimitiveValue<List<Value>>, DeepEqValue {
   }
 
   @override
-  bool deepEq(Value other) {
+  bool deepEq(Value other, [Set<DeepEqValue>? processed]) {
     if (other is! ArrValue || value.length != other.value.length) return false;
+
+    processed ??= {};
+    processed.add(this);
+
     for (var i = 0; i < value.length; ++i) {
       final v = value[i];
       final otherValue = other.value[i];
 
-      final equals = (v is DeepEqValue && v != this) ?
-          v.deepEq(otherValue) :
+      final equals = (v is DeepEqValue && !processed.contains(v)) ?
+          v.deepEq(otherValue, processed) :
           v == otherValue;
       if (!equals) return false;
     }
@@ -244,15 +248,19 @@ class ObjValue extends Value with PrimitiveValue<Map<String, Value>>, DeepEqValu
   }
 
   @override
-  bool deepEq(Value other) {
+  bool deepEq(Value other, [Set<DeepEqValue>? processed]) {
     if (other is! ObjValue || value.length != other.value.length) return false;
+
+    processed ??= {};
+    processed.add(this);
+
     for (final k in value.keys) {
       final v = value[k]!;
       final otherValue = other.value[k];
       if (otherValue == null) return false;
 
-      final equals = (v is DeepEqValue && v != this) ?
-          v.deepEq(otherValue) :
+      final equals = (v is DeepEqValue && !processed.contains(v)) ?
+          v.deepEq(otherValue, processed) :
           v == otherValue;
       if (!equals) return false;
     }

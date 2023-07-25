@@ -35,15 +35,15 @@ void main() {
 
   test('deepEq', () async {
     final res = await exec('''
-      <: ["murakami", "san", "kawaii", [1, 2, 3]]
+      let arr = ["murakami", "san", "kawaii", [1, 2, 3]]
+      arr.push(arr)
+      arr.push([ arr ])
+      <: arr
 		''');
-    
-    res as ArrValue;
-    res.value.add(res);
     expect(res, predicate((v) => (v as ArrValue).deepEq(
       ArrValue([
         StrValue('murakami'), StrValue('san'), StrValue('kawaii'),
-        ArrValue([NumValue(1), NumValue(2), NumValue(3)]), res
+        ArrValue([NumValue(1), NumValue(2), NumValue(3)]), res, ArrValue([ res ])
       ])
     )));
   });
