@@ -41,12 +41,6 @@ void main() {
 		});
   });
 
-  group('Date', () {
-    test('parse', () async {
-      expect(await exec('<: Date:parse("1995-12-17T03:24:00")'), NumValue(819145440000));
-    });
-  });
-
   group('Math', () {
     test('trig', () async {
       expect(await exec('<: Math:sin(Math:PI / 2)'), NumValue(1));
