@@ -40,6 +40,6 @@ class HasValue extends CustomMatcher {
 
   @override
   Object? featureValueOf(actual) {
-    return (actual as DeepEqValue).value;
+    return (actual as PrimitiveValue).value;
   }
 }

@@ -2,6 +2,8 @@ import 'package:aiscript/aiscript.dart';
 import 'package:test/test.dart';
 import 'utils.dart';
 
+const double epsilon = 1e-10;
+
 void main() {
   group('Core', () {
     test('range', () async {
@@ -27,6 +29,89 @@ void main() {
 
     test('abs', () async {
       expect(await exec('<: Math:abs(1 - 6)'), NumValue(5));
+    });
+
+    test('acosh', () async {
+      expect(await exec('<: Math:acosh(2.5)'), HasValue(closeTo(1.566799236972411, epsilon)));
+      expect(await exec('<: Math:acosh(0.999999999999)'), HasValue(isNaN));
+    });
+
+    test('asinh', () async {
+      expect(await exec('<: Math:asinh(2)'), HasValue(closeTo(1.4436354751788103, epsilon)));
+    });
+
+    test('atanh', () async {
+      expect(await exec('<: Math:atanh(0.5)'), HasValue(closeTo(0.549306144334055, epsilon)));
+    });
+
+    test('cbrt', () async {
+      expect(await exec('<: Math:cbrt(117649)'), NumValue(49));
+    });
+
+    test('clz32', () async {
+      expect(await exec('<: Math:clz32(4660)'), NumValue(19));
+    });
+
+    test('cosh', () async {
+      expect(await exec('<: Math:cosh(2)'), HasValue(closeTo(3.7621956910836314, epsilon)));
+    });
+
+    test('exp', () async {
+      expect(await exec('<: Math:exp(2)'), HasValue(closeTo(7.38905609893065, epsilon)));
+    });
+
+    test('expm1', () async {
+      expect(await exec('<: Math:expm1(2)'), HasValue(closeTo(6.38905609893065, epsilon)));
+    });
+
+    test('fround', () async {
+      expect(await exec('<: Math:fround(1.337)'), NumValue(1.3370000123977661));
+    });
+
+    test('hypot', () async {
+      expect(await exec('<: Math:hypot([3, 4, 5])'), HasValue(closeTo(7.0710678118654755, epsilon)));
+    });
+
+    test('imul', () async {
+      expect(await exec('<: Math:imul(4294967294, 5)'), NumValue(-10));
+    });
+
+    test('log', () async {
+      expect(await exec('<: Math:log(2)'), HasValue(closeTo(0.6931471805599453, epsilon)));
+    });
+
+    test('log1p', () async {
+      expect(await exec('<: Math:log1p(1)'), HasValue(closeTo(0.6931471805599453, epsilon)));
+    });
+
+    test('log10', () async {
+      expect(await exec('<: Math:log10(100000)'), NumValue(5));
+    });
+
+    test('log2', () async {
+      expect(await exec('<: Math:log2(2)'), NumValue(1));
+    });
+
+    test('sinh', () async {
+      expect(await exec('<: Math:sinh(2)'), HasValue(closeTo(3.626860407847019, epsilon)));
+    });
+
+    test('sqrt', () async {
+      expect(await exec('<: Math:sqrt(64)'), NumValue(8));
+      expect(() async => await exec('<: Math:sqrt(-1)'), throwsA(TypeMatcher<RuntimeError>()));
+    });
+
+    test('tanh', () async {
+      expect(await exec('<: Math:tanh(1)'), HasValue(closeTo(0.7615941559557649, epsilon)));
+    });
+
+    test('trunc', () async {
+      expect(await exec('<: Math:trunc(13.37)'), NumValue(13));
+    });
+
+    test('trunc', () async {
+      expect(await exec('<: Math:trunc(13.37)'), NumValue(13));
+      expect(await exec('<: Math:trunc(-42.84)'), NumValue(-42));
     });
 
     test('pow and sqrt', () async {

@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 import 'package:uuid/uuid.dart';
+import 'package:es6_math/es6_math.dart'
+    if (dart.library.ffi) 'package:es6_math/es6_math_native.dart';
 
 import '../core/error.dart';
 import 'value.dart';
@@ -246,32 +248,59 @@ final Map<String, Value> stdlib = {
 
   'Math:Infinity': NumValue(double.infinity),
 
+  'Math:E': NumValue(e),
+  'Math:LN2': NumValue(ln2),
+  'Math:LN10': NumValue(ln10),
+  'Math:LOG2E': NumValue(log2e),
+  'Math:LOG10E': NumValue(log10e),
   'Math:PI': NumValue(pi),
-
-  'Math:sin': NativeFnValue((args, __) async {
-    final num = args.check<NumValue>(0);
-    return NumValue(sin(num.value));
-  }),
-
-  'Math:cos': NativeFnValue((args, __) async {
-    final num = args.check<NumValue>(0);
-    return NumValue(cos(num.value));
-  }),
+  'Math:SQRT1_2': NumValue(sqrt1_2),
+  'Math:SQRT2': NumValue(sqrt2),
 
   'Math:abs': NativeFnValue((args, __) async {
     final num = args.check<NumValue>(0);
     return NumValue(num.value.abs());
   }),
 
-  'Math:sqrt': NativeFnValue((args, __) async {
+  'Math:acos': NativeFnValue((args, __) async {
     final num = args.check<NumValue>(0);
-    return NumValue(sqrt(num.value));
+    return NumValue(acos(num.value));
   }),
 
-  'Math:round': NativeFnValue((args, __) async {
+  'Math:acosh': NativeFnValue((args, __) async {
     final num = args.check<NumValue>(0);
-    if (!num.value.isFinite) return num;
-    return NumValue(num.value.round());
+    return NumValue(acosh(num.value));
+  }),
+
+  'Math:asin': NativeFnValue((args, __) async {
+    final num = args.check<NumValue>(0);
+    return NumValue(asin(num.value));
+  }),
+
+  'Math:asinh': NativeFnValue((args, __) async {
+    final num = args.check<NumValue>(0);
+    return NumValue(asinh(num.value));
+  }),
+
+  'Math:atan': NativeFnValue((args, __) async {
+    final num = args.check<NumValue>(0);
+    return NumValue(atan(num.value));
+  }),
+
+  'Math:atanh': NativeFnValue((args, __) async {
+    final num = args.check<NumValue>(0);
+    return NumValue(atanh(num.value));
+  }),
+
+  'Math:atan2': NativeFnValue((args, __) async {
+    final a = args.check<NumValue>(0);
+    final b = args.check<NumValue>(1);
+    return NumValue(atan2(a.value, b.value));
+  }),
+
+  'Math:cbrt': NativeFnValue((args, __) async {
+    final num = args.check<NumValue>(0);
+    return NumValue(cbrt(num.value));
   }),
 
   'Math:ceil': NativeFnValue((args, __) async {
@@ -280,10 +309,81 @@ final Map<String, Value> stdlib = {
     return NumValue(num.value.ceil());
   }),
 
+  'Math:clz32': NativeFnValue((args, __) async {
+    final num = args.check<NumValue>(0);
+    return NumValue(clz32(num.value.toInt()));
+  }),
+
+  'Math:cos': NativeFnValue((args, __) async {
+    final num = args.check<NumValue>(0);
+    return NumValue(cos(num.value));
+  }),
+
+  'Math:cosh': NativeFnValue((args, __) async {
+    final num = args.check<NumValue>(0);
+    return NumValue(cosh(num.value));
+  }),
+
+  'Math:exp': NativeFnValue((args, __) async {
+    final num = args.check<NumValue>(0);
+    return NumValue(exp(num.value));
+  }),
+
+  'Math:expm1': NativeFnValue((args, __) async {
+    final num = args.check<NumValue>(0);
+    return NumValue(expm1(num.value));
+  }),
+
   'Math:floor': NativeFnValue((args, __) async {
     final num = args.check<NumValue>(0);
     if (!num.value.isFinite) return num;
     return NumValue(num.value.floor());
+  }),
+
+  'Math:fround': NativeFnValue((args, __) async {
+    final num = args.check<NumValue>(0);
+    return NumValue(fround(num.value));
+  }),
+
+  'Math:hypot': NativeFnValue((args, __) async {
+    final vs = args.check<ArrValue>(0);
+    final List<num> values = [];
+    for (final v in vs.value) {
+      values.add(v.cast<NumValue>().value);
+    }
+    return NumValue(hypot(values));
+  }),
+
+  'Math:imul': NativeFnValue((args, __) async {
+    final a = args.check<NumValue>(0);
+    final b = args.check<NumValue>(1);
+    return NumValue(imul(a.value.toInt(), b.value.toInt()));
+  }),
+
+  'Math:log': NativeFnValue((args, __) async {
+    final num = args.check<NumValue>(0);
+    return NumValue(log(num.value));
+  }),
+
+  'Math:log1p': NativeFnValue((args, __) async {
+    final num = args.check<NumValue>(0);
+    return NumValue(log1p(num.value));
+  }),
+
+  'Math:log10': NativeFnValue((args, __) async {
+    final num = args.check<NumValue>(0);
+    return NumValue(log10(num.value));
+  }),
+
+  'Math:log2': NativeFnValue((args, __) async {
+    final num = args.check<NumValue>(0);
+    return NumValue(log2(num.value));
+  }),
+
+  'Math:max': NativeFnValue((args, __) async {
+    final a = args.check<NumValue>(0);
+    final b = args.check<NumValue>(1);
+    return NumValue(max(a.value, b.value));
   }),
 
   'Math:min': NativeFnValue((args, __) async {
@@ -292,10 +392,53 @@ final Map<String, Value> stdlib = {
     return NumValue(min(a.value, b.value));
   }),
 
-  'Math:max': NativeFnValue((args, __) async {
+  'Math:pow': NativeFnValue((args, __) async {
     final a = args.check<NumValue>(0);
     final b = args.check<NumValue>(1);
-    return NumValue(max(a.value, b.value));
+    return NumValue(pow(a.value, b.value));
+  }),
+
+  'Math:round': NativeFnValue((args, __) async {
+    final num = args.check<NumValue>(0);
+    if (!num.value.isFinite) return num;
+    return NumValue(num.value.round());
+  }),
+
+  'Math:sign': NativeFnValue((args, __) async {
+    final num = args.check<NumValue>(0);
+    return NumValue(num.value.sign);
+  }),
+
+  'Math:sin': NativeFnValue((args, __) async {
+    final num = args.check<NumValue>(0);
+    return NumValue(sin(num.value));
+  }),
+
+  'Math:sinh': NativeFnValue((args, __) async {
+    final num = args.check<NumValue>(0);
+    return NumValue(sinh(num.value));
+  }),
+
+  'Math:sqrt': NativeFnValue((args, __) async {
+    final num = args.check<NumValue>(0);
+    final res = sqrt(num.value);
+		if (res.isNaN) throw RuntimeError('invalid operation');
+    return NumValue(sqrt(num.value));
+  }),
+
+  'Math:tan': NativeFnValue((args, __) async {
+    final num = args.check<NumValue>(0);
+    return NumValue(tan(num.value));
+  }),
+
+  'Math:tanh': NativeFnValue((args, __) async {
+    final num = args.check<NumValue>(0);
+    return NumValue(tanh(num.value));
+  }),
+
+  'Math:trunc': NativeFnValue((args, __) async {
+    final num = args.check<NumValue>(0);
+    return NumValue(trunc(num.value));
   }),
 
   'Math:rnd': NativeFnValue((args, __) async {
