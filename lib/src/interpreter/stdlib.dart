@@ -161,6 +161,12 @@ final Map<String, Value> stdlib = {
     }
   }),
 
+  'Core:sleep': NativeFnValue((args, __) async {
+    final duration = args.check<NumValue>(0);
+    await Future.delayed(Duration(milliseconds: duration.value.toInt()));
+    return NullValue();
+  }),
+
 
   /**
    * Util
