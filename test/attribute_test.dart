@@ -59,7 +59,7 @@ void main() {
     final parser = Parser();
     final nodes = parser.parse('''
       #[serializable]
-		  let data = 1
+      let data = 1
     ''').ast;
 
     expect(nodes.length, 1);

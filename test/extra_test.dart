@@ -4,7 +4,7 @@ import 'utils.dart';
 
 void main() {
   test('FizzBuzz', () async {
-		final res = await exec('''
+    final res = await exec('''
       let res = []
       for (let i = 1, 15) {
         let msg =
@@ -15,28 +15,28 @@ void main() {
         res.push(msg)
       }
       <: res
-		''');
-		expect(res, HasValue([
-			NumValue(1),
-			NumValue(2),
-			StrValue('Fizz'),
-			NumValue(4),
-			StrValue('Buzz'),
-			StrValue('Fizz'),
-			NumValue(7),
-			NumValue(8),
-			StrValue('Fizz'),
-			StrValue('Buzz'),
-			NumValue(11),
-			StrValue('Fizz'),
-			NumValue(13),
-			NumValue(14),
-			StrValue('FizzBuzz'),
-		]));
-	});
+    ''');
+    expect(res, HasValue([
+      NumValue(1),
+      NumValue(2),
+      StrValue('Fizz'),
+      NumValue(4),
+      StrValue('Buzz'),
+      StrValue('Fizz'),
+      NumValue(7),
+      NumValue(8),
+      StrValue('Fizz'),
+      StrValue('Buzz'),
+      NumValue(11),
+      StrValue('Fizz'),
+      NumValue(13),
+      NumValue(14),
+      StrValue('FizzBuzz'),
+    ]));
+  });
 
   test('SKI', () async {
-		final res = await exec('''
+    final res = await exec('''
       let s = @(x) { @(y) { @(z) {
         //let f = x(z) f(@(a){ let g = y(z) g(a) })
         let f = x(z)
@@ -64,7 +64,7 @@ void main() {
 
       let sksik = [s, [k, [s, i]], k]
       c([sksik, "foo", print])
-		''');
-		expect(res, StrValue('foo'));
-	});
+    ''');
+    expect(res, StrValue('foo'));
+  });
 }

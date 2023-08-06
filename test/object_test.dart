@@ -4,7 +4,7 @@ import 'utils.dart';
 
 void main() {
   test('property access', () async {
-		final res = await exec('''
+    final res = await exec('''
       let obj = {
         a: {
           b: {
@@ -14,12 +14,12 @@ void main() {
       }
 
       <: obj.a.b.c
-		''');
-		expect(res, NumValue(42));
-	});
+    ''');
+    expect(res, NumValue(42));
+  });
 
   test('property access (fn call)', () async {
-		final res = await exec('''
+    final res = await exec('''
       @f() { 42 }
 
       let obj = {
@@ -31,12 +31,12 @@ void main() {
       }
 
       <: obj.a.b.c()
-		''');
-		expect(res, NumValue(42));
-	});
+    ''');
+    expect(res, NumValue(42));
+  });
 
   test('property assign', () async {
-		final res = await exec('''
+    final res = await exec('''
       let obj = {
         a: 1
         b: {
@@ -51,8 +51,8 @@ void main() {
       obj.b.d.e = 42
 
       <: obj
-		''');
-		expect(res, HasValue({
+    ''');
+    expect(res, HasValue({
       'a': NumValue(24),
       'b': HasValue({
         'c': NumValue(2),
@@ -61,7 +61,7 @@ void main() {
         })
       })
     }));
-	});
+  });
 
   test('deepEq', () async {
     final res = await exec('''
@@ -77,7 +77,7 @@ void main() {
       obj.f = obj
       obj.g = { value: obj }
       <: obj
-		''');
+    ''');
     expect(res, predicate((v) => (v as ObjValue).deepEq(
       ObjValue({
         'a': NumValue(1),

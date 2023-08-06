@@ -3,42 +3,42 @@ import 'package:test/test.dart';
 import 'utils.dart';
 
 void main() {
-	test('Basic', () async {
-		final res = await exec('''
+  test('Basic', () async {
+    final res = await exec('''
       <: match 2 {
         1 => "a"
         2 => "b"
         3 => "c"
       }
-		''');
-		expect(res, StrValue('b'));
-	});
+    ''');
+    expect(res, StrValue('b'));
+  });
 
-	test('When default not provided, returns null', () async {
-		final res = await exec('''
+  test('When default not provided, returns null', () async {
+    final res = await exec('''
       <: match 42 {
         1 => "a"
         2 => "b"
         3 => "c"
       }
-		''');
-		expect(res, NullValue());
-	});
+    ''');
+    expect(res, NullValue());
+  });
 
-	test('With default', () async {
-		final res = await exec('''
+  test('With default', () async {
+    final res = await exec('''
       <: match 42 {
         1 => "a"
         2 => "b"
         3 => "c"
         * => "d"
-		}
-		''');
-		expect(res, StrValue('d'));
-	});
+    }
+    ''');
+    expect(res, StrValue('d'));
+  });
 
-	test('With block', () async {
-		final res = await exec('''
+  test('With block', () async {
+    final res = await exec('''
       <: match 2 {
         1 => 1
         2 => {
@@ -48,12 +48,12 @@ void main() {
         }
         3 => 3
       }
-		''');
-		expect(res, NumValue(3));
-	});
+    ''');
+    expect(res, NumValue(3));
+  });
 
-	test('With return', () async {
-		final res = await exec('''
+  test('With return', () async {
+    final res = await exec('''
       @f(x) {
         match x {
           1 => {
@@ -63,7 +63,7 @@ void main() {
         "foo"
       }
       <: f(1)
-		''');
-		expect(res, StrValue('ai'));
-	});
+    ''');
+    expect(res, StrValue('ai'));
+  });
 }
