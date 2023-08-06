@@ -23,24 +23,24 @@ void main() {
     expect(
       await exec('''
         var tmp = null
-				@func() {
-					tmp = true
-					return true
-				}
-				false && func()
-				<: tmp
+        @func() {
+          tmp = true
+          return true
+        }
+        false && func()
+        <: tmp
       '''),
       NullValue()
     );
     expect(
       await exec('''
         var tmp = null
-				@func() {
-					tmp = true
-					return true
-				}
-				true && func()
-				<: tmp
+        @func() {
+          tmp = true
+          return true
+        }
+        true && func()
+        <: tmp
       '''),
       BoolValue(true)
     );
@@ -56,24 +56,24 @@ void main() {
     expect(
       await exec('''
         var tmp = null
-				@func() {
-					tmp = true
-					return true
-				}
-				true || func()
-				<: tmp
+        @func() {
+          tmp = true
+          return true
+        }
+        true || func()
+        <: tmp
       '''),
       NullValue()
     );
     expect(
       await exec('''
         var tmp = null
-				@func() {
-					tmp = true
-					return true
-				}
-				false || func()
-				<: tmp
+        @func() {
+          tmp = true
+          return true
+        }
+        false || func()
+        <: tmp
       '''),
       BoolValue(true)
     );

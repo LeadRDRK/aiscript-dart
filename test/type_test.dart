@@ -3,17 +3,17 @@ import 'package:test/test.dart';
 import 'utils.dart';
 
 void main() {
-	test('def', () async {
-		final res = await exec('''
+  test('def', () async {
+    final res = await exec('''
       let abc: num = 1
       var xyz: str = "abc"
       <: [abc xyz]
-		''');
-		expect(res, HasValue([NumValue(1), StrValue('abc')]));
-	});
+    ''');
+    expect(res, HasValue([NumValue(1), StrValue('abc')]));
+  });
 
-	test('fn def', () async {
-		final res = await exec('''
+  test('fn def', () async {
+    final res = await exec('''
       @f(x: arr<num>, y: str, z: @(num) => bool): arr<num> {
         x[3] = 0
         y = "abc"
@@ -23,8 +23,8 @@ void main() {
       }
 
       <: f([1, 2, 3], "a", @(n) { n == 1 })
-		''');
-		expect(res, HasValue([NumValue(1), NumValue(2), NumValue(3), NumValue(0), NumValue(5)]));
-	});
+    ''');
+    expect(res, HasValue([NumValue(1), NumValue(2), NumValue(3), NumValue(0), NumValue(5)]));
+  });
 
 }

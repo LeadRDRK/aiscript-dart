@@ -20,25 +20,25 @@ void main() {
     });
 
     test('to_str', () async {
-			expect(await exec('<: Core:to_str("abc")'), StrValue('abc'));
-			expect(await exec('<: Core:to_str(123)'), StrValue('123'));
-			expect(await exec('<: Core:to_str(true)'), StrValue('true'));
-			expect(await exec('<: Core:to_str(false)'), StrValue('false'));
-			expect(await exec('<: Core:to_str(null)'), StrValue('null'));
-			expect(await exec('<: Core:to_str({ a: "abc", b: 1234 })'), StrValue('{ a: "abc", b: 1234 }'));
-			expect(await exec('<: Core:to_str([ true, "abc", 123, null ])'), StrValue('[ true, "abc", 123, null ]'));
-			expect(await exec('<: Core:to_str(@( a, b, c ) {})'), StrValue('@( a, b, c ) { ... }'));
-			expect(await exec('''
-				let arr = []
-				arr.push(arr)
-				<: Core:to_str(arr)
-			'''), StrValue('[ ... ]'));
-			expect(await exec('''
-				let arr = []
-				arr.push({ value: arr })
-				<: Core:to_str(arr)
-			'''), StrValue('[ { value: ... } ]'));
-		});
+      expect(await exec('<: Core:to_str("abc")'), StrValue('abc'));
+      expect(await exec('<: Core:to_str(123)'), StrValue('123'));
+      expect(await exec('<: Core:to_str(true)'), StrValue('true'));
+      expect(await exec('<: Core:to_str(false)'), StrValue('false'));
+      expect(await exec('<: Core:to_str(null)'), StrValue('null'));
+      expect(await exec('<: Core:to_str({ a: "abc", b: 1234 })'), StrValue('{ a: "abc", b: 1234 }'));
+      expect(await exec('<: Core:to_str([ true, "abc", 123, null ])'), StrValue('[ true, "abc", 123, null ]'));
+      expect(await exec('<: Core:to_str(@( a, b, c ) {})'), StrValue('@( a, b, c ) { ... }'));
+      expect(await exec('''
+        let arr = []
+        arr.push(arr)
+        <: Core:to_str(arr)
+      '''), StrValue('[ ... ]'));
+      expect(await exec('''
+        let arr = []
+        arr.push({ value: arr })
+        <: Core:to_str(arr)
+      '''), StrValue('[ { value: ... } ]'));
+    });
   });
 
   group('Math', () {
@@ -226,38 +226,38 @@ void main() {
 
   group('Str', () {
     test('lf', () async {
-			final res = await exec('''
-			  <: Str:lf
-			''');
-			expect(res, StrValue('\n'));
-		});
+      final res = await exec('''
+        <: Str:lf
+      ''');
+      expect(res, StrValue('\n'));
+    });
   });
 
   group('Json', () {
     test('stringify', () async {
-			final res = await exec('''
-			  <: Json:stringify({
+      final res = await exec('''
+        <: Json:stringify({
           a: 'hoge'
           b: 21
           c: true
           arr: [1, 2, 3]
           fn: @(){}
         })
-			''');
-			expect(res, StrValue('{"a":"hoge","b":21,"c":true,"arr":[1,2,3],"fn":"<function>"}'));
-		});
+      ''');
+      expect(res, StrValue('{"a":"hoge","b":21,"c":true,"arr":[1,2,3],"fn":"<function>"}'));
+    });
 
     test('parse', () async {
-			final res = await exec('''
-			  <: Json:parse('{"a":"hoge","b":21,"c":true,"arr":[1,2,3]}')
-			''');
-			expect(res, HasValue({
+      final res = await exec('''
+        <: Json:parse('{"a":"hoge","b":21,"c":true,"arr":[1,2,3]}')
+      ''');
+      expect(res, HasValue({
         'a': StrValue('hoge'),
         'b': NumValue(21),
         'c': BoolValue(true),
         'arr': HasValue([NumValue(1), NumValue(2), NumValue(3)])
       }));
-		});
+    });
 
     test('parsable', () async {
       expect(await exec('<: Json:parsable("{ \\"abc\\": 123 }")'), BoolValue(true));

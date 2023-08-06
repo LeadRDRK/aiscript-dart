@@ -252,7 +252,7 @@ void main() {
       expect(
         () async => await exec('''
           let x = { let: 1 }
-			    x.let
+          x.let
         '''),
         throwsA(TypeMatcher<SyntaxError>())
       );
