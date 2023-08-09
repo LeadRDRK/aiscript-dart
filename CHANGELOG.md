@@ -1,3 +1,7 @@
+# 0.4.1
+- Added explicit type casts for parser def.
+- Minor documentation improvement.
+
 # 0.4.0
 - `Core:v` = `0.15.0`
 - `Core:to_str` now allows any type of value.
