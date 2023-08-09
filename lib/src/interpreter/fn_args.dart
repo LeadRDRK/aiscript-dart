@@ -9,7 +9,7 @@ class FnArgs extends ListBase<Value> {
 
   /// Checks if an argument has the intended type.
   /// 
-  /// Throws a TypeError if the value cannot be casted to
+  /// Throws a [TypeError] if the value cannot be casted to
   /// the desired type.
   T check<T extends Value>(int i) {
     assert(T != Never);

@@ -30,7 +30,7 @@ abstract class Value {
 
   /// Cast a Value to another Value type.
   /// 
-  /// Throws a TypeError if the value cannot be casted to
+  /// Throws a [TypeError] if the value cannot be casted to
   /// the desired type.
   T cast<T extends Value>() {
     assert(T != Never);

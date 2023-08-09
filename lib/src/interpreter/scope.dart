@@ -38,7 +38,7 @@ class Scope extends MapBase<String, Value> {
 
   /// Adds a variable to the scope.
   /// 
-  /// Throws a RuntimeError if the variable already exists.
+  /// Throws a [RuntimeError] if the variable already exists.
   void add(String key, Value value) {
     final layer = _layers[0];
     if (layer.containsKey(key)) {
@@ -49,7 +49,7 @@ class Scope extends MapBase<String, Value> {
 
   /// Assigns a new value to a variable.
   /// 
-  /// Throws a RuntimeError if the variable doesn't exist.
+  /// Throws a [RuntimeError] if the variable doesn't exist.
   void assign(String key, Value value) => _firstLayerWithKey(key)[key] = value;
 
   Map<String, Value> _firstLayerWithKey(Object? key) {

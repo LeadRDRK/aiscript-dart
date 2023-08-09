@@ -27,7 +27,7 @@ class Interpreter {
   /// Default: 300
   int irqRate;
   /// The step to interrupt at.
-  /// An interrupt request will occur when (stepCount++ % irqRate) == irqAt
+  /// An interrupt request will occur when `(stepCount++ % irqRate) == irqAt`
   /// 
   /// Default: 299
   int irqAt;
@@ -49,7 +49,7 @@ class Interpreter {
   /// The global scope will be initialized with the variable in vars,
   /// along with other default variables.
   /// By default, print() and readline() will not do anything. Provide
-  /// an implementation in printFn and readlineFn to make them work.
+  /// an implementation in [printFn] and [readlineFn] to make them work.
   Interpreter(Map<String, Value> vars, {
     this.printFn,
     this.readlineFn,
