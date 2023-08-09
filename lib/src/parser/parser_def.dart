@@ -10,22 +10,24 @@ class AiScriptParserDefinition extends AiScriptGrammarDefinition {
   @override
   Parser block() => super.block().token().map((token) =>
     BlockNode(
-      statements: token.value[1],
+      statements: token.value[1] as List<Node>,
       loc: Loc.fromToken(token)
     )
   );
 
   @override
-  Parser bracket(String brackets, Parser parser) => super.bracket(brackets, parser).map((value) => value[1]);
+  Parser bracket(String brackets, Parser parser) =>
+      super.bracket(brackets, parser).map((value) => value[1]);
 
   @override
-  Parser statementsBase(Object input) => super.statementsBase(input).map((value) => value.elements.cast<Node>());
+  Parser statementsBase(Object input) =>
+    super.statementsBase(input).map((value) => (value.elements as List).cast<Node>());
 
   @override
   Parser namespace() => super.namespace().token().map((token) =>
     NamespaceNode(
-      name: token.value[1],
-      members: token.value[3] ?? [],
+      name: token.value[1] as String,
+      members: (token.value[3] ?? []) as List<Node>,
       loc: Loc.fromToken(token)
     )
   );
@@ -38,23 +40,23 @@ class AiScriptParserDefinition extends AiScriptGrammarDefinition {
   @override
   Parser metaWithName() => super.metaWithName().map((value) =>
     MetaNode(
-      name: value[0],
-      value: value[1]
+      name: value[0] as String,
+      value: value[1] as Node
     )
   );
 
   @override
   Parser metaWithoutName() => super.metaWithoutName().map((value) =>
-    MetaNode(value: value)
+    MetaNode(value: value as Node)
   );
 
   @override
   Parser varDef() => super.varDef().token().map((token) =>
     DefinitionNode(
-      name: token.value[1],
-      varType: token.value[2],
-      expr: token.value[4],
-      mut: token.value[0] == 'var',
+      name: token.value[1] as String,
+      varType: token.value[2] as Node?,
+      expr: token.value[4] as Node,
+      mut: (token.value[0] as String) == 'var',
       attr: [],
       loc: Loc.fromToken(token)
     )
@@ -70,7 +72,7 @@ class AiScriptParserDefinition extends AiScriptGrammarDefinition {
         name: 'print',
         loc: Loc(token.start, token.start + 1)
       ),
-      args: [token.value[1]],
+      args: [token.value[1] as Node],
       loc: Loc.fromToken(token)
     )
   );
@@ -78,8 +80,8 @@ class AiScriptParserDefinition extends AiScriptGrammarDefinition {
   @override
   Parser attr() => super.attr().token().map((token) =>
     AttributeNode(
-      name: token.value[1],
-      value: token.value[2] ?? BoolNode(value: true),
+      name: token.value[1] as String,
+      value: (token.value[2] ?? BoolNode(value: true)) as Node,
       loc: Loc.fromToken(token)
     )
   );
@@ -95,18 +97,18 @@ class AiScriptParserDefinition extends AiScriptGrammarDefinition {
   @override
   Parser eachWithParens() => super.eachWithParens().map((value) =>
     EachNode(
-      varName: value[1],
-      items: value[3],
-      body: value[5]
+      varName: value[1] as String,
+      items: value[3] as Node,
+      body: value[5] as Node
     )
   );
 
   @override
   Parser eachWithoutParens() => super.eachWithoutParens().map((value) =>
     EachNode(
-      varName: value[0],
-      items: value[2],
-      body: value[3]
+      varName: value[0] as String,
+      items: value[2] as Node,
+      body: value[3] as Node
     )
   );
 
@@ -121,43 +123,43 @@ class AiScriptParserDefinition extends AiScriptGrammarDefinition {
   @override
   Parser forVarWithParens() => super.forVarWithParens().map((value) =>
     ForNode(
-      varName: value[0],
-      from: value[1]?[1] ?? NumNode(value: 0),
-      to: value[3],
-      body: value[5]
+      varName: value[0] as String,
+      from: (value[1]?[1] ?? NumNode(value: 0)) as Node,
+      to: value[3] as Node,
+      body: value[5] as Node
     )
   );
 
   @override
   Parser forTimesWithParens() => super.forTimesWithParens().map((value) =>
     ForNode(
-      times: value[0],
-      body: value[2]
+      times: value[0] as Node,
+      body: value[2] as Node
     )
   );
 
   @override
   Parser forVarWithoutParens() => super.forVarWithoutParens().map((value) =>
     ForNode(
-      varName: value[0],
-      from: value[1]?[1] ?? NumNode(value: 0),
-      to: value[3],
-      body: value[4]
+      varName: value[0] as String,
+      from: (value[1]?[1] ?? NumNode(value: 0)) as Node,
+      to: value[3] as Node,
+      body: value[4] as Node
     )
   );
 
   @override
   Parser forTimesWithoutParens() => super.forTimesWithoutParens().map((value) =>
     ForNode(
-      times: value[0],
-      body: value[1]
+      times: value[0] as Node,
+      body: value[1] as Node
     )
   );
 
   @override
   Parser return_() => super.return_().token().map((token) =>
     ReturnNode(
-      expr: token.value[1],
+      expr: token.value[1] as Node,
       loc: Loc.fromToken(token)
     )
   );
@@ -165,7 +167,7 @@ class AiScriptParserDefinition extends AiScriptGrammarDefinition {
   @override
   Parser loop() => super.loop().token().map((token) =>
     LoopNode(
-      statements: token.value[2],
+      statements: token.value[2] as List<Node>,
       loc: Loc.fromToken(token)
     )
   );
@@ -182,14 +184,14 @@ class AiScriptParserDefinition extends AiScriptGrammarDefinition {
 
   @override
   Parser assignOrExpr() => super.assignOrExpr().token().map((token) {
-    final dest = token.value[0];
-    final assign = token.value[1];
+    final dest = token.value[0] as Node;
+    final assign = token.value[1] as List<dynamic>?;
     if (assign == null) {
       return dest; // Expr
     }
     
-    final op = assign[0];
-    final expr = assign[1];
+    final op = assign[0] as String;
+    final expr = assign[1] as Node;
     final loc = Loc.fromToken(token);
 
     if (op == '+=') {
@@ -205,12 +207,12 @@ class AiScriptParserDefinition extends AiScriptGrammarDefinition {
 
   @override
   Parser infixOrExpr2() => super.infixOrExpr2().token().map((token) {
-    if (token.value[1].isEmpty) {
-      return token.value[0]; // Expr2
-    }
+    final head = token.value[0] as Node;
+    final tails = token.value[1] as List<dynamic>;
 
-    final Node head = token.value[0];
-    final List<dynamic> tails = token.value[1];
+    if (tails.isEmpty) {
+      return head; // Expr2
+    }
 
     final operands = [head, ...tails.map((e) => e[1] as Node)];
     final operators = tails.map((e) => e[0] as String).toList();
@@ -228,37 +230,37 @@ class AiScriptParserDefinition extends AiScriptGrammarDefinition {
   @override
   Parser not() => super.not().token().map((token) => 
     NotNode(
-      expr: token.value[1],
+      expr: token.value[1] as Node,
       loc: Loc.fromToken(token)
     )
   );
 
   @override
   Parser chainOrExpr3() => super.chainOrExpr3().token().map((token) =>
-    token.value[1].isNotEmpty ?
+    (token.value[1] as List).isNotEmpty ?
     ChainedNode(
-      parent: token.value[0],
-      chain: token.value[1].cast<Node>(),
+      parent: token.value[0] as Node,
+      chain: List.castFrom(token.value[1] as List),
       loc: Loc.fromToken(token)
     ) :
-    token.value[0] // Expr3
+    token.value[0] as Node // Expr3
   );
 
   @override
   Parser callChain() => super.callChain().token().map((token) =>
     CallChainNode(
-      args: token.value[1],
+      args: token.value[1] as List<Node>,
       loc: Loc.fromToken(token)
     )
   );
 
   @override
-  Parser callArgs() => super.callArgs().map((value) => value.elements.cast<Node>());
+  Parser callArgs() => super.callArgs().map((value) => (value.elements as List).cast<Node>());
 
   @override
   Parser indexChain() => super.indexChain().token().map((token) =>
     IndexChainNode(
-      index: token.value[1],
+      index: token.value[1] as Node,
       loc: Loc.fromToken(token)
     )
   );
@@ -266,7 +268,7 @@ class AiScriptParserDefinition extends AiScriptGrammarDefinition {
   @override
   Parser propChain() => super.propChain().token().map((token) =>
     PropChainNode(
-      name: token.value[1],
+      name: token.value[1] as String,
       loc: Loc.fromToken(token)
     )
   );
@@ -274,20 +276,21 @@ class AiScriptParserDefinition extends AiScriptGrammarDefinition {
   @override
   Parser if_() => super.if_().token().map((token) =>
     IfNode(
-      cond: token.value[1],
-      then: token.value[2],
-      elseifBlocks: token.value[3] ?? [],
-      elseBlock: token.value[4],
+      cond: token.value[1] as Node,
+      then: token.value[2] as Node,
+      elseifBlocks: List.castFrom(token.value[3] ?? []),
+      elseBlock: token.value[4] as Node?,
       loc: Loc.fromToken(token)
     )
   );
 
   @override
-  Parser elseifBlocks() => super.elseifBlocks().map((value) => value.elements.cast<ElseifBlock>());
+  Parser elseifBlocks() =>
+      super.elseifBlocks().map((value) => (value.elements as List).cast<ElseifBlock>());
 
   @override
   Parser elseifBlock() => super.elseifBlock().map((value) =>
-    ElseifBlock(value[1], value[2])
+    ElseifBlock(value[1] as Node, value[2] as Node)
   );
 
   @override
@@ -296,16 +299,16 @@ class AiScriptParserDefinition extends AiScriptGrammarDefinition {
   @override
   Parser match() => super.match().token().map((token) =>
     MatchNode(
-      about: token.value[1],
-      qs: (token.value[3] as List).cast<MatchCase>(),
-      defaultRes: token.value[4],
+      about: token.value[1] as Node,
+      qs: List.castFrom(token.value[3] as List),
+      defaultRes: token.value[4] as Node?,
       loc: Loc.fromToken(token)
     )
   );
 
   @override
   Parser matchCase() => super.matchCase().map((value) =>
-    MatchCase(value[0], value[2])
+    MatchCase(value[0] as Node, value[2] as Node)
   );
 
   @override
@@ -314,7 +317,7 @@ class AiScriptParserDefinition extends AiScriptGrammarDefinition {
   @override
   Parser eval() => super.eval().token().map((token) =>
     BlockNode(
-      statements: token.value[2],
+      statements: token.value[2] as List<Node>,
       loc: Loc.fromToken(token)
     )
   );
@@ -322,7 +325,7 @@ class AiScriptParserDefinition extends AiScriptGrammarDefinition {
   @override
   Parser identifier() => super.identifier().token().map((token) =>
     IdentifierNode(
-      name: token.value,
+      name: token.value as String,
       loc: Loc.fromToken(token)
     )
   );
@@ -341,12 +344,12 @@ class AiScriptParserDefinition extends AiScriptGrammarDefinition {
   Parser tmplEsc() => super.tmplEsc().map(_escChar);
 
   @override
-  Parser tmplExpr() => super.tmplExpr().map((value) => value[1].cast<Node>());
+  Parser tmplExpr() => super.tmplExpr().map((value) => (value[1] as List).cast<Node>());
   
   @override
   Parser str() => super.str().token().map((token) =>
     StrNode(
-      value: token.value.join(),
+      value: (token.value as List).join(),
       loc: Loc.fromToken(token)
     )
   );
@@ -360,7 +363,7 @@ class AiScriptParserDefinition extends AiScriptGrammarDefinition {
   @override
   Parser num_() => super.num_().token().map((token) =>
     NumNode(
-      value: token.value,
+      value: token.value as num,
       loc: Loc.fromToken(token)
     )
   );
@@ -374,7 +377,7 @@ class AiScriptParserDefinition extends AiScriptGrammarDefinition {
   @override
   Parser boolean() => super.boolean().token().map((token) =>
     BoolNode(
-      value: token.value[0] == 'true',
+      value: (token.value[0] as String) == 'true',
       loc: Loc.fromToken(token)
     )
   );
@@ -386,26 +389,26 @@ class AiScriptParserDefinition extends AiScriptGrammarDefinition {
 
   @override
   Parser objBase(Object value) => super.objBase(value).map((value) =>
-    { for (var v in value[1].elements) v[0]: v[2] }
+    { for (var v in value[1].elements) v[0] as String: v[2] as Node }
   );
 
   @override
   Parser obj() => super.obj().token().map((token) =>
     ObjNode(
-      value: token.value.cast<String, Node>(),
+      value: token.value as Map<String, Node>,
       loc: Loc.fromToken(token)
     )
   );
 
   @override
   Parser arrBase(Object value) => super.arrBase(value).map((value) =>
-    value[1].map((v) => v[0]).toList().cast<Node>()
+    (value[1] as List).map((v) => v[0]).toList().cast<Node>()
   );
 
   @override
   Parser arr() => super.arr().token().map((token) =>
     ArrNode(
-      value: token.value,
+      value: token.value as List<Node>,
       loc: Loc.fromToken(token)
     )
   );
@@ -413,17 +416,17 @@ class AiScriptParserDefinition extends AiScriptGrammarDefinition {
   @override
   Parser fnBase() => super.fnBase().token().map((token) =>
     FnNode(
-      params: token.value[1],
-      retType: token.value[3],
-      children: token.value[5]
+      params: token.value[1] as List<FnParam>,
+      retType: token.value[3] as Node?,
+      children: token.value[5] as List<Node>
     )
   );
 
   @override
   Parser fnDef() => super.fnDef().token().map((token) =>
     DefinitionNode(
-      name: token.value[1],
-      expr: token.value[2]..loc = Loc.fromToken(token),
+      name: token.value[1] as String,
+      expr: (token.value[2] as Node)..loc = Loc.fromToken(token),
       mut: false,
       attr: [],
       loc: Loc.fromToken(token)
@@ -437,16 +440,17 @@ class AiScriptParserDefinition extends AiScriptGrammarDefinition {
 
   @override
   Parser param() => super.param().map((value) =>
-    FnParam(value[0], value[1])
+    FnParam(value[0] as String, value[1] as Node?)
   );
 
   @override
-  Parser params() => super.params().map((value) => value.elements.cast<FnParam>());
+  Parser params() =>
+      super.params().map((value) => (value.elements as List).cast<FnParam>());
 
   @override
   Parser staticArr() => super.staticArr().token().map((token) =>
     ArrNode(
-      value: token.value,
+      value: token.value as List<Node>,
       loc: Loc.fromToken(token)
     )
   );
@@ -454,7 +458,7 @@ class AiScriptParserDefinition extends AiScriptGrammarDefinition {
   @override
   Parser staticObj() => super.staticObj().token().map((token) =>
     ObjNode(
-      value: token.value.cast<String, Node>(),
+      value: token.value as Map<String, Node>,
       loc: Loc.fromToken(token)
     )
   );
@@ -462,8 +466,8 @@ class AiScriptParserDefinition extends AiScriptGrammarDefinition {
   @override
   Parser fnType() => super.fnType().token().map((token) =>
     FnTypeSourceNode(
-      args: token.value[1].cast<Node>(),
-      result: token.value[4],
+      args: List.castFrom(token.value[1] as List),
+      result: token.value[4] as Node,
       loc: Loc.fromToken(token)
     )
   );
@@ -474,8 +478,8 @@ class AiScriptParserDefinition extends AiScriptGrammarDefinition {
   @override
   Parser namedType() => super.namedType().token().map((token) =>
     NamedTypeSourceNode(
-      name: token.value[0],
-      inner: token.value[1]?[1],
+      name: token.value[0] as String,
+      inner: token.value[1]?[1] as Node?,
       loc: Loc.fromToken(token)
     )
   );
@@ -516,7 +520,7 @@ List<dynamic> _concatTemplate(List<dynamic> arr) {
 
 class AiScriptPreprocessParserDefinition extends AiScriptPreprocessGrammarDefinition {
   @override
-  Parser start() => super.start().map((value) => value.join());
+  Parser start() => super.start().map((value) => (value as List).join());
 
   @override
   Parser tmpl() => super.tmpl().flatten();
