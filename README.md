@@ -12,6 +12,7 @@ This package also contains a command line REPL program in `bin/repl.dart`
 
 ### Implementation details
 - `Core:v` will correspond to the latest AiScript version that this is compatible with (not the library's actual version).
+- **Currently fully compatible with:** AiScript v0.15.0
 - Mostly acts the same as the original implementation. If you find any differences, please report it as a bug (unless explicitly specified below).
 - Similar to the original, the API of this library is still unstable. Please be careful when upgrading to a new minor version (e.g. 0.1.0 -> 0.2.0) as breaking API changes might be present.
 
