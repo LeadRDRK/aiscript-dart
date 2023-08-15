@@ -1,3 +1,6 @@
+# 0.5.0
+- Removed `Interpreter.addTimerFuture()` and `Interpreter.runTimers()` (timers will run just fine on their own, unless a blocking operation is preventing them from running)
+
 # 0.4.1
 - Added explicit type casts for parser def.
 - Minor documentation improvement.
