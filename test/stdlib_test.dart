@@ -276,7 +276,7 @@ void main() {
         Async:timeout(1000, @() {
           <: true
         })
-      ''', runTimers: true);
+      ''');
 
       int duration = DateTime.now().millisecondsSinceEpoch - prevTime;
       expect(res, BoolValue(true));
@@ -294,7 +294,7 @@ void main() {
             <: true
           }
         })
-      ''', runTimers: true);
+      ''');
 
       int duration = DateTime.now().millisecondsSinceEpoch - prevTime;
       expect(res, BoolValue(true));

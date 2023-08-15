@@ -42,7 +42,6 @@ class Interpreter {
 
   bool _aborted = false;
   final List<void Function()> _abortHandlers = [];
-  final List<Future<void>> _timerFutures = [];
 
   /// Creates a new interpreter state.
   /// 
@@ -456,17 +455,6 @@ class Interpreter {
     }
     
     return meta;
-  }
-
-  /// Runs the Async timers.
-  Future<void> runTimers() async {
-    await Future.wait(_timerFutures);
-    _timerFutures.clear();
-  }
-
-  /// Adds a future for a timer.
-  void addTimerFuture(Future<void> future) {
-    _timerFutures.add(future);
   }
 
   /// Registers an abort handler, which will be called when execution is aborted.

@@ -583,13 +583,9 @@ final Map<String, Value> stdlib = {
     abort() => timer.cancel();
     state.registerAbortHandler(abort);
 
-    final completer = Completer();
-    state.addTimerFuture(completer.future);
-
     return NativeFnValue((_, __) async {
       timer.cancel();
       state.unregisterAbortHandler(abort);
-      completer.complete();
       return NullValue();
     });
   }),
@@ -601,13 +597,9 @@ final Map<String, Value> stdlib = {
     Timer? timer;
     abort() => timer!.cancel();
 
-    final completer = Completer();
-    state.addTimerFuture(completer.future);
-
     timer = Timer(Duration(milliseconds: delay.value.toInt()), () async {
       await state.call(callback);
       state.unregisterAbortHandler(abort);
-      completer.complete();
     });
 
     state.registerAbortHandler(abort);

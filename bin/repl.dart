@@ -27,42 +27,38 @@ AiScript REPL - Core:v = $ver
 Type "help" for more information.
 ''');
   
-  while (true) {
-    stdout.write('>');
+  var script = '';
+  int indentLevel = 0;
+    
+  stdout.write('> ');
+  await for (final line in stdin.transform(utf8.decoder)) {
+    script += '$line\n';
 
-    var script = '';
-    int indentLevel = 0;
-    while (true) {
+    var clMatch = clRegex.firstMatch(line);
+    if (clMatch != null) {
+      indentLevel += clMatch[1]!.length;
+    }
+    else {
+      var crMatch = crRegex.firstMatch(line);
+      if (crMatch != null) {
+        indentLevel -= crMatch[1]!.length;
+      }
+    }
+
+    if (indentLevel <= 0) {
+      try {
+        ParseResult res = parser.parse(script);
+        state.source = res.source;
+        print(await state.exec(res.ast));
+      }
+      catch (e) {
+        print(e);
+      }
+      script = '';
+      stdout.write('> ');
+    }
+    else {
       stdout.write('${'...' * indentLevel} ');
-      final line = stdin.readLineSync(encoding: utf8);
-      if (line == null) {
-        print('Failed to read from stdin');
-        return;
-      }
-      script += '$line\n';
-
-      var clMatch = clRegex.firstMatch(line);
-      if (clMatch != null) {
-        indentLevel += clMatch[1]!.length;
-      }
-      else {
-        var crMatch = crRegex.firstMatch(line);
-        if (crMatch != null) {
-          indentLevel -= crMatch[1]!.length;
-        }
-      }
-
-      if (indentLevel <= 0) break;
-    }
-
-    try {
-      ParseResult res = parser.parse(script);
-      state.source = res.source;
-      print(await state.exec(res.ast));
-      await state.runTimers();
-    }
-    catch (e) {
-      print(e);
     }
   }
 }
