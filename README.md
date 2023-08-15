@@ -20,7 +20,6 @@ This package also contains a command line REPL program in `bin/repl.dart`
 - Out of range array assignments are allowed for now. Empty spots will be filled with null values.
 - Null safety: All functions must return a Value object. If a function doesn't need to return a value, it must still return a NullValue object.
 - Number values are passed to functions as a copy. Other types of values are marked as final and cannot be changed once initialized.
-- Async functions (timeout, interval) will not run the timers on their own due to how Dart works. You must await for `Interpreter.runTimers()` after `Interpreter.exec()` has finished so that the timers would run.
 
 # API reference
 [View on pub.dev](https://pub.dev/documentation/aiscript/latest/)
