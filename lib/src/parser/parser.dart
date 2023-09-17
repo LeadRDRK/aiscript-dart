@@ -56,15 +56,13 @@ class Parser {
 
     var res = _preParser.parse(input);
     if (res.isFailure) {
-      final p = Token.lineAndColumnOf(res.buffer, res.position);
-      throw SyntaxError(res.message, LineColumn.fromList(p));
+      throw SyntaxError(res.message, Parser.getLineColumn(res.buffer, res.position));
     }
 
     final String source = res.value;
     res = _parser.parse(source);
     if (res.isFailure) {
-      final p = Token.lineAndColumnOf(res.buffer, res.position);
-      throw SyntaxError(res.message, LineColumn.fromList(p));
+      throw SyntaxError(res.message, Parser.getLineColumn(res.buffer, res.position));
     }
 
     var nodes = res.value as List<Node>;
