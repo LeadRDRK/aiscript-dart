@@ -68,7 +68,7 @@ class Parser {
     }
 
     var nodes = res.value as List<Node>;
-    getLineColumn(int pos) => LineColumn.fromList(Token.lineAndColumnOf(res.buffer, pos));
+    getLineColumn(int pos) => Parser.getLineColumn(source, pos);
 
     for (final plugin in validatePlugins) {
       nodes = plugin(nodes, getLineColumn);
@@ -81,9 +81,11 @@ class Parser {
     return ParseResult(nodes, source);
   }
 
+  static LineColumn getLineColumn(String source, int pos) =>
+      LineColumn.fromList(Token.lineAndColumnOf(source, pos));
+
   static final _langVersionRegex = RegExp(r'^\s*\/\/\/\s*@\s*([a-zA-Z0-9_.-]+)(?:[\r\n][\s\S]*)?$');
   /// Gets the language version of the script (defined in the script as a comment)
-  static String? getLangVersion(String input) {
-    return _langVersionRegex.firstMatch(input)?[1];
-  }
+  static String? getLangVersion(String input) =>
+      _langVersionRegex.firstMatch(input)?[1];
 }
