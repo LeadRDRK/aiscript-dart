@@ -75,6 +75,10 @@ class Interpreter {
   /// 
   /// [disableExtensions] can be set to `true` to disable extensions in
   /// the standard library.
+  /// 
+  /// [moduleResolver] defaults to [DummyModuleResolver], which is a module
+  /// resolver that always fails to resolve any module. Implement your own
+  /// [ModuleResolver] or use the included [FileModuleResolver] to make it work.
   Interpreter(Map<String, Value> vars, {
     this.printFn,
     this.readlineFn,

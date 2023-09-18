@@ -1,6 +1,7 @@
 import 'module_resolver.dart';
 import '../core/error.dart';
 
+/// A dummy module resolver. Always fails to resolve any module.
 class DummyModuleResolver implements ModuleResolver {
   const DummyModuleResolver();
 
