@@ -2,6 +2,14 @@
 /// File: example/modules.dart
 /// This example shows you how to use modules.
 /// Depends on the modules in the "modules" directory.
+/// 
+/// This example makes use of the FileModuleResolver,
+/// a module resolver which resolves modules from files
+/// and does not support the web platform, hence the need
+/// for a separate import.
+/// 
+/// You can make your own module resolver by implementing the
+/// ModuleResolver abstract class.
 ///
 
 import 'package:aiscript/aiscript.dart';
