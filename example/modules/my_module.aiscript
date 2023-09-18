@@ -1,0 +1,15 @@
+<: __module.path
+
+let myValue = 21
+let pi = require("math/pi")
+
+@myFunc() {
+    <: `myFunc - Pi: {pi}`
+}
+
+// Export from a module by returning a single value.
+// You can use an object or an array to pack multiple values.
+return {
+    value: myValue,
+    func: myFunc
+}

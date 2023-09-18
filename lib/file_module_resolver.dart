@@ -1,0 +1,1 @@
+export 'src/interpreter/file_module_resolver.dart';

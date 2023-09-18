@@ -1,0 +1,3 @@
+<: __module.path
+
+return 3.14

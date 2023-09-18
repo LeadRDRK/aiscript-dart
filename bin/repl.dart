@@ -49,7 +49,7 @@ Type "help" for more information.
       try {
         ParseResult res = parser.parse(script);
         state.source = res.source;
-        print(await state.exec(res.ast));
+        print(await state.exec(res.ast, state.scope));
       }
       catch (e) {
         print(e);

@@ -4,7 +4,10 @@ import 'value.dart';
 import 'fn_args.dart';
 import 'scope.dart';
 import 'stdlib.dart';
+import 'stdlib_ext.dart';
 import 'primitive_props.dart';
+import 'module_resolver.dart';
+import 'dummy_module_resolver.dart';
 
 import '../core/node.dart';
 import '../core/ast.dart';
@@ -14,7 +17,16 @@ import '../core/line_column.dart';
 /// An AiScript interpreter state.
 class Interpreter {
   /// The global scope.
-  Scope scope;
+  final Scope scope;
+
+  late Scope _currentExecScope;
+  /// The current script execution scope.
+  /// 
+  /// This is meant to be accessed inside of a native function
+  /// to retrieve the current execution scope. Outside of an
+  /// execution context, this value will always be set to the
+  /// root scope.
+  Scope get currentExecScope => _currentExecScope;
 
   /// The print function.
   void Function(Value)? printFn;
@@ -40,6 +52,16 @@ class Interpreter {
   /// The current step count.
   int stepCount = 0;
 
+  /// The module resolver used by `require()`.
+  final ModuleResolver moduleResolver;
+
+  /// The loaded modules.
+  /// 
+  /// Module scripts will be run once when they're first required, then
+  /// stored in this map for later use. Therefore, any modules present
+  /// in this map will skip the module resolver.
+  final Map<String, Value> modules = {};
+
   bool _aborted = false;
   final List<void Function()> _abortHandlers = [];
 
@@ -47,26 +69,50 @@ class Interpreter {
   /// 
   /// The global scope will be initialized with the variable in vars,
   /// along with other default variables.
+  /// 
   /// By default, print() and readline() will not do anything. Provide
   /// an implementation in [printFn] and [readlineFn] to make them work.
+  /// 
+  /// [disableExtensions] can be set to `true` to disable extensions in
+  /// the standard library.
   Interpreter(Map<String, Value> vars, {
     this.printFn,
     this.readlineFn,
     this.irqRate = 300,
     this.irqAt = 300 - 1,
     this.irqDuration = const Duration(milliseconds: 5),
-    this.maxStep
+    this.maxStep,
+    this.moduleResolver = const DummyModuleResolver(),
+    bool disableExtensions = false
   })
-  : scope = Scope([{...vars, ...stdlib}]);
+  : scope = Scope([{
+      ...vars,
+      ...stdlib,
+      if (!disableExtensions) ...stdlibExt
+    }])
+  {
+    _currentExecScope = scope;
+  }
 
   /// Executes the script.
   /// 
   /// Returns the value returned from the script, or NullValue if
   /// there isn't any.
-  Future<Value> exec(List<Node> script) async {
+  /// 
+  /// By default, `exec` will create a child scope from the root scope
+  /// for the execution (which differs from the original implementation).
+  /// Set [scope] to the root scope or a different scope to override this behavior.
+  Future<Value> exec(List<Node> script, [Scope? scope]) async {
     if (script.isEmpty) return NullValue();
     await _collectNs(script);
-    return _run(script, scope);
+
+    scope ??= Scope.child(this.scope);
+    final prevScope = _currentExecScope;
+    _currentExecScope = scope;
+    final res = await _run(script, scope);
+    _currentExecScope = prevScope;
+    
+    return res;
   }
 
   Future<Value> _eval(Node node, Scope scope) async {
