@@ -4,7 +4,7 @@ import 'dart:math';
 import 'package:uuid/uuid.dart';
 import 'package:es6_math/es6_math.dart';
 
-import '../core/error.dart';
+import 'runtime_error.dart';
 import 'value.dart';
 import 'fn_args.dart';
 
@@ -91,19 +91,19 @@ final Map<String, Value> stdlib = {
     return NumValue(a.value * b.value);
   }),
 
-  'Core:pow': NativeFnValue((args, __) async {
+  'Core:pow': NativeFnValue((args, state) async {
     final a = args.check<NumValue>(0);
     final b = args.check<NumValue>(1);
     num res = pow(a.value, b.value);
-    if (res.isNaN) throw RuntimeError('invalid operation');
+    if (res.isNaN) throw RuntimeError(state.currentContext, 'invalid operation');
     return NumValue(res);
   }),
 
-  'Core:div': NativeFnValue((args, __) async {
+  'Core:div': NativeFnValue((args, state) async {
     final a = args.check<NumValue>(0);
     final b = args.check<NumValue>(1);
     num res = a.value / b.value;
-    if (res.isNaN) throw RuntimeError('invalid operation');
+    if (res.isNaN) throw RuntimeError(state.currentContext, 'invalid operation');
     return NumValue(res);
   }),
 
@@ -418,10 +418,10 @@ final Map<String, Value> stdlib = {
     return NumValue(sinh(num.value));
   }),
 
-  'Math:sqrt': NativeFnValue((args, __) async {
+  'Math:sqrt': NativeFnValue((args, state) async {
     final num = args.check<NumValue>(0);
     final res = sqrt(num.value);
-		if (res.isNaN) throw RuntimeError('invalid operation');
+		if (res.isNaN) throw RuntimeError(state.currentContext, 'invalid operation');
     return NumValue(sqrt(num.value));
   }),
 

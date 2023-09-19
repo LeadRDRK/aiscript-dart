@@ -9,11 +9,12 @@ abstract class AiScriptError implements Exception {
 
   /// The type of the error.
   String get type;
+  
   /// The error message.
   final String message;
 
   @override
-  String toString() => '$type: $message${pos != null ? ' (at $pos)' : ''}';
+  String toString() => '$type: $message${pos == null ? '' : ' (at $pos)'}';
 }
 
 /// A syntax error.
@@ -30,20 +31,6 @@ class TypeError extends AiScriptError {
 
   @override
   String get type => 'TypeError';
-}
-
-/// A runtime error.
-class RuntimeError extends AiScriptError {
-  RuntimeError(String message, [LineColumn? pos]) : super(message, pos);
-
-  @override
-  String get type => 'RuntimeError';
-}
-
-/// An index out of range error.
-class IndexOutOfRangeError extends RuntimeError {
-  IndexOutOfRangeError(int index, int max, [LineColumn? pos])
-  : super('index out of range (index: $index, max: $max)', pos);
 }
 
 /// A reserved word error.

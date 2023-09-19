@@ -7,6 +7,7 @@ import 'primitive_props.dart';
 import 'module_resolver.dart';
 import 'dummy_module_resolver.dart';
 import 'context.dart';
+import 'runtime_error.dart';
 
 import '../core/node.dart';
 import '../core/ast.dart';
@@ -123,13 +124,28 @@ class Interpreter {
   }
 
   Future<Value> _eval(Node node, Scope scope) async {
+    try {
+      return await __eval(node, scope);
+    }
+    on AiScriptError catch (e) {
+      e.pos ??= currentContext.getLineColumn(node.loc);
+      rethrow;
+    }
+    on ScopeException catch (e) {
+      final ctx = currentContext;
+      throw RuntimeError(ctx, e.toString(), ctx.getLineColumn(node.loc));
+    }
+  }
+
+  Future<Value> __eval(Node node, Scope scope) async {
     if (_aborted) return NullValue();
     if ((stepCount++ % irqRate) == irqAt) await Future.delayed(irqDuration);
-    if (maxStep != null && stepCount > maxStep!) {
-      throw RuntimeError('max step exceeded');
-    }
 
     final ctx = currentContext;
+    if (maxStep != null && stepCount > maxStep!) {
+      throw RuntimeError(ctx, 'max step exceeded');
+    }
+
     switch (node.type) {
       case 'call': node as CallNode;
         final callee = (await _eval(node.target, scope)).cast<FnValue>();
@@ -260,7 +276,7 @@ class Interpreter {
           assignee.value[dest.name] = v;
         }
         else {
-          throw RuntimeError('invalid left-hand side in assignment', ctx.getLineColumn(dest.loc));
+          throw RuntimeError(ctx, 'invalid left-hand side in assignment', ctx.getLineColumn(dest.loc));
         }
         return NullValue();
       
@@ -306,10 +322,10 @@ class Interpreter {
         else if (target is PrimitiveValue && primitiveProps.containsKey(target.type)) {
           final props = primitiveProps[target.type]!;
           if (props.containsKey(node.name)) return props[node.name]!(target);
-          throw RuntimeError('no such prop "${node.name}" in ${target.type}', ctx.getLineColumn(node.loc));
+          throw RuntimeError(ctx, 'no such prop "${node.name}" in ${target.type}');
         }
         else {
-          throw RuntimeError('cannot read prop "${node.name}" of ${target.type}', ctx.getLineColumn(node.loc));
+          throw RuntimeError(ctx, 'cannot read prop "${node.name}" of ${target.type}');
         }
       
       case 'index': node as IndexNode;
@@ -317,7 +333,7 @@ class Interpreter {
         final i = (await _eval(node.index, scope)).cast<NumValue>();
         final item = target.value.elementAtOrNull(i.value.toInt());
         if (item == null) {
-          throw IndexOutOfRangeError(i.value.toInt(), target.value.length - 1, ctx.getLineColumn(node.loc));
+          throw IndexOutOfRangeError(ctx, i.value.toInt(), target.value.length);
         }
         return item;
       
@@ -390,7 +406,7 @@ class Interpreter {
         }
 
       default:
-        throw RuntimeError('invalid node type: ${node.type}', ctx.getLineColumn(node.loc));
+        throw RuntimeError(ctx, 'invalid node type: ${node.type}');
     }
   }
 
@@ -428,7 +444,8 @@ class Interpreter {
         // TODO
       }
       else {
-        throw RuntimeError('invalid ns member type: ${node.type}', currentContext.getLineColumn(node.loc));
+        final ctx = currentContext;
+        throw RuntimeError(ctx, 'invalid ns member type: ${node.type}', ctx.getLineColumn(node.loc));
       }
     }
   }
@@ -464,10 +481,8 @@ class Interpreter {
         try {
           res = await fn.nativeFn(FnArgs(passedArgs.toList()), this);
         }
-        catch (e) {
-          if (e is AiScriptError) {
-            e.pos = currentContext.getLineColumn(loc);
-          }
+        on AiScriptError catch (e) {
+          e.pos ??= currentContext.getLineColumn(loc);
           rethrow;
         }
       }

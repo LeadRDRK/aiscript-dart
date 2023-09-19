@@ -5,7 +5,7 @@ import '../parser/parser.dart';
 
 /// A script execution context.
 class Context {
-  Context(this.scope, {this.source, this.isModule = false});
+  Context(this.scope, {this.source, this.moduleName});
 
   /// The source script.
   final String? source;
@@ -13,8 +13,8 @@ class Context {
   /// The scope.
   final Scope scope;
 
-  /// Whether the script is a module.
-  final bool isModule;
+  /// The module's name, if the context belongs to a module.
+  final String? moduleName;
 
   /// Get the line and column of a node's start location.
   /// 

@@ -1,7 +1,7 @@
-import '../core/error.dart';
 import 'scope.dart';
 import 'value.dart';
 import 'context.dart';
+import 'runtime_error.dart';
 
 final Map<String, Value> stdlibExt = {
   'require': NativeFnValue((args, state) async {
@@ -9,10 +9,10 @@ final Map<String, Value> stdlibExt = {
 
     // Resolve the module's path
     final ctx = state.currentContext;
-    String? currentPath = ctx.isModule ? _getCurrentModulePath(ctx.scope) : null;
+    String? currentPath = ctx.moduleName == null ? null : _getCurrentModulePath(ctx.scope);
     final path = await state.moduleResolver.resolvePath(name, currentPath);
     if (path == null) {
-      throw RuntimeError('cannot find module "$name"');
+      throw RuntimeError(ctx, 'cannot find module "$name"');
     }
 
     // Check if it's already loaded
@@ -27,23 +27,11 @@ final Map<String, Value> stdlibExt = {
       'path': StrValue(path)
     });
     final scope = Scope.child(state.scope, {'__module': moduleObj}, name);
-    final context = Context(scope, source: resolved.source, isModule: true);
+    final context = Context(scope, source: resolved.source, moduleName: name);
 
-    try {
-      var module = await state.exec(resolved.ast, context);
-      state.modules[path] = module;
-      return module;
-    }
-    catch (e) {
-      // TODO: error location in module, rethrow original error
-      if (e is AiScriptError) {
-        throw RuntimeError('error while executing module "$name": ${e.message}');
-      }
-      else {
-        // Rethrow other errors
-        rethrow;
-      }
-    }
+    var module = await state.exec(resolved.ast, context);
+    state.modules[path] = module;
+    return module;
   })
 };
 

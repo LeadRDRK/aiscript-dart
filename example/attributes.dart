@@ -47,7 +47,10 @@ let foo = "bar"
 
         case 'Key': {
           final strNode = attr.value;
-          if (strNode is! StrNode) throw RuntimeError('Invalid Key attribute');
+          if (strNode is! StrNode) {
+            print('Warning: invalid Key attribute');
+            break;
+          }
           key = strNode.value;
           break;
         }
