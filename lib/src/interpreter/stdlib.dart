@@ -576,8 +576,10 @@ final Map<String, Value> stdlib = {
       if (immediate.value) state.call(callback);
     }
     
+    // Store the context so the function could execute in the same context later on
+    final ctx = state.currentContext;
     var timer = Timer.periodic(Duration(milliseconds: interval.value.toInt()), (_) {
-      state.call(callback);
+      state.call(callback, [], null, ctx);
     });
 
     abort() => timer.cancel();
@@ -597,8 +599,9 @@ final Map<String, Value> stdlib = {
     Timer? timer;
     abort() => timer!.cancel();
 
-    timer = Timer(Duration(milliseconds: delay.value.toInt()), () async {
-      await state.call(callback);
+    final ctx = state.currentContext;
+    timer = Timer(Duration(milliseconds: delay.value.toInt()), () {
+      state.call(callback, [], null, ctx);
       state.unregisterAbortHandler(abort);
     });
 

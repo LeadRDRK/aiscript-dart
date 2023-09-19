@@ -1,13 +1,15 @@
 import '../core/error.dart';
 import 'scope.dart';
 import 'value.dart';
+import 'context.dart';
 
 final Map<String, Value> stdlibExt = {
   'require': NativeFnValue((args, state) async {
     final name = args.check<StrValue>(0).value;
 
     // Resolve the module's path
-    String? currentPath = _getCurrentModulePath(state.currentExecScope);
+    final ctx = state.currentContext;
+    String? currentPath = ctx.isModule ? _getCurrentModulePath(ctx.scope) : null;
     final path = await state.moduleResolver.resolvePath(name, currentPath);
     if (path == null) {
       throw RuntimeError('cannot find module "$name"');
@@ -25,9 +27,10 @@ final Map<String, Value> stdlibExt = {
       'path': StrValue(path)
     });
     final scope = Scope.child(state.scope, {'__module': moduleObj}, name);
+    final context = Context(scope, source: resolved.source, isModule: true);
 
     try {
-      var module = await state.exec(resolved.ast, scope);
+      var module = await state.exec(resolved.ast, context);
       state.modules[path] = module;
       return module;
     }
@@ -45,13 +48,11 @@ final Map<String, Value> stdlibExt = {
 };
 
 String? _getCurrentModulePath(Scope scope) {
-  if (scope.containsKey('__module')) {
-    final meta = scope['__module'];
-    if (meta is ObjValue) {
-      final path = meta.value['path'];
-      if (path is StrValue) {
-        return path.value;
-      }
+  final meta = scope['__module'];
+  if (meta is ObjValue) {
+    final path = meta.value['path'];
+    if (path is StrValue) {
+      return path.value;
     }
   }
   return null;

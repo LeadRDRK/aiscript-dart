@@ -1,5 +1,3 @@
-import 'package:petitparser/petitparser.dart';
-
 import 'value.dart';
 import 'fn_args.dart';
 import 'scope.dart';
@@ -8,25 +6,24 @@ import 'stdlib_ext.dart';
 import 'primitive_props.dart';
 import 'module_resolver.dart';
 import 'dummy_module_resolver.dart';
+import 'context.dart';
 
 import '../core/node.dart';
 import '../core/ast.dart';
 import '../core/error.dart';
-import '../core/line_column.dart';
 
 /// An AiScript interpreter state.
 class Interpreter {
   /// The global scope.
   final Scope scope;
 
-  late Scope _currentExecScope;
-  /// The current script execution scope.
+  Context? _currentContext;
+  /// The current script execution context.
   /// 
   /// This is meant to be accessed inside of a native function
-  /// to retrieve the current execution scope. Outside of an
-  /// execution context, this value will always be set to the
-  /// root scope.
-  Scope get currentExecScope => _currentExecScope;
+  /// to retrieve the current execution context. Outside of an
+  /// execution context, accessing it will result in an error.
+  Context get currentContext => _currentContext!;
 
   /// The print function.
   void Function(Value)? printFn;
@@ -59,7 +56,7 @@ class Interpreter {
   /// 
   /// Module scripts will be run once when they're first required, then
   /// stored in this map for later use. Therefore, any modules present
-  /// in this map will skip the module resolver.
+  /// in this map will skip the module resolving step.
   final Map<String, Value> modules = {};
 
   bool _aborted = false;
@@ -93,29 +90,35 @@ class Interpreter {
       ...vars,
       ...stdlib,
       if (!disableExtensions) ...stdlibExt
-    }])
-  {
-    _currentExecScope = scope;
-  }
+    }]);
 
   /// Executes the script.
   /// 
   /// Returns the value returned from the script, or NullValue if
   /// there isn't any.
   /// 
-  /// By default, `exec` will create a child scope from the root scope
-  /// for the execution (which differs from the original implementation).
-  /// Set [scope] to the root scope or a different scope to override this behavior.
-  Future<Value> exec(List<Node> script, [Scope? scope]) async {
+  /// [context] can be set to modify the script execution context.
+  /// By default, a context is created with the source set to `this.source`,
+  /// and a child scope created from the root scope for the execution
+  /// (which differs from the original implementation).
+  /// Create a custom [context] that uses the root scope or a different scope
+  /// to override this behavior.
+  Future<Value> exec(List<Node> script, [Context? context]) async {
     if (script.isEmpty) return NullValue();
-    await _collectNs(script);
 
-    scope ??= Scope.child(this.scope);
-    final prevScope = _currentExecScope;
-    _currentExecScope = scope;
-    final res = await _run(script, scope);
-    _currentExecScope = prevScope;
-    
+    context ??= Context(Scope.child(scope), source: source);
+    final prevContext = _currentContext;
+    _currentContext = context;
+
+    Value res;
+    try {
+      await _collectNs(script);
+      res = await _run(script, context.scope);
+    }
+    finally {
+      _currentContext = prevContext;
+    }
+
     return res;
   }
 
@@ -126,6 +129,7 @@ class Interpreter {
       throw RuntimeError('max step exceeded');
     }
 
+    final ctx = currentContext;
     switch (node.type) {
       case 'call': node as CallNode;
         final callee = (await _eval(node.target, scope)).cast<FnValue>();
@@ -256,7 +260,7 @@ class Interpreter {
           assignee.value[dest.name] = v;
         }
         else {
-          throw RuntimeError('invalid left-hand side in assignment', _lineColumn(dest.loc));
+          throw RuntimeError('invalid left-hand side in assignment', ctx.getLineColumn(dest.loc));
         }
         return NullValue();
       
@@ -302,10 +306,10 @@ class Interpreter {
         else if (target is PrimitiveValue && primitiveProps.containsKey(target.type)) {
           final props = primitiveProps[target.type]!;
           if (props.containsKey(node.name)) return props[node.name]!(target);
-          throw RuntimeError('no such prop "${node.name}" in ${target.type}', _lineColumn(node.loc));
+          throw RuntimeError('no such prop "${node.name}" in ${target.type}', ctx.getLineColumn(node.loc));
         }
         else {
-          throw RuntimeError('cannot read prop "${node.name}" of ${target.type}', _lineColumn(node.loc));
+          throw RuntimeError('cannot read prop "${node.name}" of ${target.type}', ctx.getLineColumn(node.loc));
         }
       
       case 'index': node as IndexNode;
@@ -313,7 +317,7 @@ class Interpreter {
         final i = (await _eval(node.index, scope)).cast<NumValue>();
         final item = target.value.elementAtOrNull(i.value.toInt());
         if (item == null) {
-          throw IndexOutOfRangeError(i.value.toInt(), target.value.length - 1, _lineColumn(node.loc));
+          throw IndexOutOfRangeError(i.value.toInt(), target.value.length - 1, ctx.getLineColumn(node.loc));
         }
         return item;
       
@@ -386,7 +390,7 @@ class Interpreter {
         }
 
       default:
-        throw RuntimeError('invalid node type: ${node.type}', _lineColumn(node.loc));
+        throw RuntimeError('invalid node type: ${node.type}', ctx.getLineColumn(node.loc));
     }
   }
 
@@ -424,14 +428,9 @@ class Interpreter {
         // TODO
       }
       else {
-        throw RuntimeError('invalid ns member type: ${node.type}', _lineColumn(node.loc));
+        throw RuntimeError('invalid ns member type: ${node.type}', currentContext.getLineColumn(node.loc));
       }
     }
-  }
-
-  LineColumn? _lineColumn(Loc? loc) {
-    if (source == null || loc == null) return null;
-    return LineColumn.fromList(Token.lineAndColumnOf(source!, loc.start));
   }
 
   Value _passArgValue(Value arg) {
@@ -443,30 +442,50 @@ class Interpreter {
 
   /// Calls the function.
   /// 
-  /// The optional loc value will be used for errors.
+  /// The optional [loc] value will be used for errors.
   /// If defined, error objects will include the location where the call occurred.
-  Future<Value> call(FnValue fn, [List<Value> args = const [], Loc? loc]) async {
+  /// 
+  /// [context] can be set to modify the function's execution context.
+  /// By default it has the same behavior as [exec], however if it's called inside
+  /// of an execution context, it will not assign its own context.
+  /// Setting the [context] explicitly overrides this behavior.
+  Future<Value> call(FnValue fn, [List<Value> args = const [], Loc? loc, Context? context]) async {
+    Context? prevContext;
+    bool setContext = _currentContext == null || context != null;
+    if (setContext) {
+      prevContext = _currentContext;
+      _currentContext = context ?? Context(Scope.child(scope), source: source);
+    }
+
     final passedArgs = args.map((value) => _passArgValue(value));
-    if (fn is NativeFnValue) {
-      try {
-        return await fn.nativeFn(FnArgs(passedArgs.toList()), this);
-      }
-      catch (e) {
-        if (e is AiScriptError) {
-          e.pos = _lineColumn(loc);
+    Value res;
+    try {
+      if (fn is NativeFnValue) {
+        try {
+          res = await fn.nativeFn(FnArgs(passedArgs.toList()), this);
         }
-        rethrow;
+        catch (e) {
+          if (e is AiScriptError) {
+            e.pos = currentContext.getLineColumn(loc);
+          }
+          rethrow;
+        }
+      }
+      else {
+        fn as NormalFnValue;
+        final Map<String, Value> argVars = {};
+        for (var i = 0; i < fn.params.length; ++i) {
+          argVars[fn.params[i]] = passedArgs.elementAtOrNull(i) ?? NullValue();
+        }
+        final scope = Scope.child(fn.scope, argVars);
+        res = await _run(fn.statements, scope);
       }
     }
-    else {
-      fn as NormalFnValue;
-      final Map<String, Value> argVars = {};
-      for (var i = 0; i < fn.params.length; ++i) {
-        argVars[fn.params[i]] = passedArgs.elementAtOrNull(i) ?? NullValue();
-      }
-      final scope = Scope.child(fn.scope, argVars);
-      return _run(fn.statements, scope);
+    finally {
+      if (setContext) _currentContext = prevContext;
     }
+
+    return res;
   }
 
   static dynamic _nodeToDart(Node node) {

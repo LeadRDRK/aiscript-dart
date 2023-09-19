@@ -29,7 +29,8 @@ Type "help" for more information.
   
   var script = '';
   int indentLevel = 0;
-    
+  final scope = Scope.child(state.scope);
+
   stdout.write('> ');
   await for (final line in stdin.transform(utf8.decoder)) {
     script += '$line\n';
@@ -47,9 +48,9 @@ Type "help" for more information.
 
     if (indentLevel <= 0) {
       try {
-        ParseResult res = parser.parse(script);
-        state.source = res.source;
-        print(await state.exec(res.ast, state.scope));
+        final res = parser.parse(script);
+        final context = Context(scope, source: res.source);
+        print(await state.exec(res.ast, context));
       }
       catch (e) {
         print(e);
