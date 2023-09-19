@@ -1,5 +1,4 @@
 import 'value.dart';
-import 'fn_args.dart';
 
 final Map<String, Map<String, Value Function(Value)>> primitiveProps = {
   'num': {
