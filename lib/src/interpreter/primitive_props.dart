@@ -119,7 +119,7 @@ final Map<String, Map<String, Value Function(Value)>> primitiveProps = {
 
       var i = 0;
       final newArr = await Future.wait(
-        value.map((item) => state.call(fn, FnArgs([item, NumValue(i++)])))
+        value.map((item) => state.call(fn, args: [item, NumValue(i++)]))
       );
 
       return ArrValue(newArr.toList());
@@ -132,7 +132,7 @@ final Map<String, Map<String, Value Function(Value)>> primitiveProps = {
       final List<Value> newArr = [];
       for (var i = 0; i < value.length; ++i) {
         final item = value[i];
-        final res = await state.call(fn, FnArgs([item, NumValue(i)]));
+        final res = await state.call(fn, args: [item, NumValue(i)]);
         final resValue = res.cast<BoolValue>().value;
         if (resValue) newArr.add(item);
       }
@@ -151,7 +151,7 @@ final Map<String, Map<String, Value Function(Value)>> primitiveProps = {
       if (acc == null) return NullValue();
 
       for (var i = withInitVal ? 0 : 1; i < value.length; ++i) {
-        acc = await state.call(fn, FnArgs([acc!, value[i], NumValue(i)]));
+        acc = await state.call(fn, args: [acc!, value[i], NumValue(i)]);
       }
 
       return acc!;
@@ -163,7 +163,7 @@ final Map<String, Map<String, Value Function(Value)>> primitiveProps = {
 
       for (var i = 0; i < value.length; ++i) {
         final item = value[i];
-        final res = await state.call(fn, FnArgs([item, NumValue(i)]));
+        final res = await state.call(fn, args: [item, NumValue(i)]);
         final resValue = res.cast<BoolValue>().value;
         if (resValue) return item;
       }
@@ -200,7 +200,7 @@ final Map<String, Map<String, Value Function(Value)>> primitiveProps = {
       final fn = args.check<FnValue>(0);
 
       value.setAll(0, await _mergeSort(value, (a, b) async =>
-          (await state.call(fn, FnArgs([a, b])))
+          (await state.call(fn, args: [a, b]))
           .cast<NumValue>().value.toInt()
       ));
 

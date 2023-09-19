@@ -134,7 +134,7 @@ class Interpreter {
       case 'call': node as CallNode;
         final callee = (await _eval(node.target, scope)).cast<FnValue>();
         final args = await Future.wait(node.args.map((e) => _eval(e, scope)));
-        return call(callee, FnArgs(args), node.loc);
+        return call(callee, args: args, loc: node.loc);
 
       case 'if': node as IfNode;
         final cond = (await _eval(node.cond, scope)).cast<BoolValue>();
@@ -449,7 +449,7 @@ class Interpreter {
   /// By default it has the same behavior as [exec], however if it's called inside
   /// of an execution context, it will not assign its own context.
   /// Setting the [context] explicitly overrides this behavior.
-  Future<Value> call(FnValue fn, [List<Value> args = const [], Loc? loc, Context? context]) async {
+  Future<Value> call(FnValue fn, {List<Value> args = const [], Loc? loc, Context? context}) async {
     Context? prevContext;
     bool setContext = _currentContext == null || context != null;
     if (setContext) {
