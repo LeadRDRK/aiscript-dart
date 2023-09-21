@@ -4,21 +4,20 @@ import '../parser/parser.dart';
 abstract class ModuleResolver {
   /// Resolves a module.
   /// 
-  /// [path] is the name of the module (as returned by calling [resolvePath])
+  /// [path] is the path of the module (as returned by calling [resolvePath])
   /// 
   /// Returns `null` if the module was not found.
   Future<ResolvedModule> resolve(String path);
 
-  /// Resolves the full name a module.
+  /// Resolves the full path of a module.
   /// 
   /// [name] is the name of the module
-  /// (as specified when calling `require`)
+  /// (as specified when calling `require()`)
   /// 
-  /// [currentPath] is the `module.path` value of the current module,
-  /// if `require` was called inside of a module.
+  /// [currentPath] is the `__module.path` value of the current module,
+  /// if `require()` was called inside of a module.
   ///
-  /// This will be the name that will be used to store loaded modules.
-  /// It is expected to return the same name for identifiers that refers to
+  /// This function must return the same path for names that refer to
   /// the same module.
   Future<String?> resolvePath(String name, String? currentPath);
 }
