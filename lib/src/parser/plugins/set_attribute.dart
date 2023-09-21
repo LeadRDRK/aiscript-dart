@@ -2,7 +2,7 @@ import 'package:aiscript/aiscript.dart';
 
 List<Node> setAttribute(List<Node> nodes, LineColumnFn getLineColumn) {
   final List<Node> result = [];
-	final List<AttributeNode> stockedAttrs = [];
+  final List<AttributeNode> stockedAttrs = [];
 
   for (final node in nodes) {
     if (node is AttributeNode) {

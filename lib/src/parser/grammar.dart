@@ -66,7 +66,7 @@ class AiScriptGrammarDefinition extends GrammarDefinition {
   
   // Expression list
   Parser expr() => 
-	    ref0(infixOrExpr2);
+      ref0(infixOrExpr2);
 
   Parser expr2() =>
       ref0(if_) |         // "if"

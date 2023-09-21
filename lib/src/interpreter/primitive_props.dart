@@ -72,13 +72,13 @@ final Map<String, Map<String, Value Function(Value)>> primitiveProps = {
     }),
 
     'codepoint_at': (target) => NativeFnValue((args, __) async {
-			final value = target.cast<StrValue>().value;
+      final value = target.cast<StrValue>().value;
       final i = args.check<NumValue>(0).value.toInt();
 
       return (i >= 0 && i < value.length) ?
           NumValue(value.codeUnitAt(i)) :
           NullValue();
-		}),
+    }),
   },
 
   'arr': {

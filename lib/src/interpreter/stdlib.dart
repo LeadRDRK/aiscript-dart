@@ -421,7 +421,7 @@ final Map<String, Value> stdlib = {
   'Math:sqrt': NativeFnValue((args, state) async {
     final num = args.check<NumValue>(0);
     final res = sqrt(num.value);
-		if (res.isNaN) throw RuntimeError(state.currentContext, 'invalid operation');
+    if (res.isNaN) throw RuntimeError(state.currentContext, 'invalid operation');
     return NumValue(sqrt(num.value));
   }),
 
