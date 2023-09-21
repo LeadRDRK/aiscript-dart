@@ -14,6 +14,7 @@ import 'literal_test.dart' as literal_test;
 import 'loop_test.dart' as loop_test;
 import 'match_test.dart' as match_test;
 import 'meta_test.dart' as meta_test;
+import 'module_test.dart' as module_test;
 import 'namespace_test.dart' as namespace_test;
 import 'object_test.dart' as object_test;
 import 'operator_test.dart' as operator_test;
@@ -40,6 +41,7 @@ void main() {
   group('loop', loop_test.main);
   group('match', match_test.main);
   group('meta', meta_test.main);
+  group('module', module_test.main);
   group('namespace', namespace_test.main);
   group('object', object_test.main);
   group('operator', operator_test.main);
