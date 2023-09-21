@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:aiscript/aiscript.dart';
 import 'package:test/test.dart';
 
-Future<Value> exec(String program, {Map<String, Value>? vars}) async {
+Future<Value> exec(String program, {Map<String, Value>? vars, ModuleResolver? moduleResolver}) async {
   final completer = Completer<Value>();
 
   final parser = Parser();
@@ -10,7 +10,8 @@ Future<Value> exec(String program, {Map<String, Value>? vars}) async {
 
   final state = Interpreter(vars ?? {},
     printFn: (v) => completer.complete(v),
-    maxStep: 9999
+    maxStep: 9999,
+    moduleResolver: moduleResolver ?? const DummyModuleResolver()
   );
   state.source = res.source;
   state.exec(res.ast).catchError((error) {

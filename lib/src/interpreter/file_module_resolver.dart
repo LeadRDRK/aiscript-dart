@@ -7,7 +7,7 @@ import '../parser/parser.dart';
 
 /// A module resolver that loads the modules from files.
 class FileModuleResolver implements ModuleResolver {
-  FileModuleResolver(this.parser, {
+  const FileModuleResolver(this.parser, {
     this.paths = const [''],
     this.sanitizePaths = false,
     this.encoding = utf8,
@@ -69,7 +69,7 @@ class FileModuleResolver implements ModuleResolver {
     // Find the file
     File? file;
     for (final path in paths) {
-      var modulePath = p.join(path, name);
+      var modulePath = p.normalize(p.join(path, name));
       if (ext != null) {
         if (p.extension(name) != ext) modulePath += ext!;
       }
