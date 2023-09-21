@@ -231,6 +231,13 @@ void main() {
       ''');
       expect(res, StrValue('\n'));
     });
+
+    test('from_codepoint', () async {
+      final res = await exec('''
+        <: Str:from_codepoint(65)
+      ''');
+      expect(res, StrValue('A'));
+    });
   });
 
   group('Json', () {

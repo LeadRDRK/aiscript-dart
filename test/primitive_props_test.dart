@@ -101,6 +101,13 @@ void main() {
       ''');
       expect(res, StrValue('el'));
     });
+
+    test('codepoint_at', () async {
+      final res = await exec('''
+        <: "aiscript".split().map(@(x, _) { x.codepoint_at(0) })
+      ''');
+      expect(res, HasValue([97, 105, 115, 99, 114, 105, 112, 116].map((e) => NumValue(e))));
+    });
   });
 
   group('arr', () {
