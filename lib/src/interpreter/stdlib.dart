@@ -512,6 +512,11 @@ final Map<String, Value> stdlib = {
     return NumValue(b.value.compareTo(a.value));
   }),
 
+  'Str:from_codepoint': NativeFnValue((args, __) async {
+    final codePoint = args.check<NumValue>(0);
+    return StrValue(String.fromCharCode(codePoint.value.toInt()));
+  }),
+
 
   /**
    * Obj

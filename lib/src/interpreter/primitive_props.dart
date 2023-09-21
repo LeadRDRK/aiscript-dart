@@ -62,16 +62,23 @@ final Map<String, Map<String, Value Function(Value)>> primitiveProps = {
 
     'pick': (target) => NativeFnValue((args, __) async {
       final value = target.cast<StrValue>().value;
-      final i = args.check<NumValue>(0).value;
+      final i = args.check<NumValue>(0).value.toInt();
 
       final chars = _splitStr(value);
-      if (i < 0 || i > chars.length - 1) {
-        return NullValue();
-      }
-      else {
-        return StrValue(chars[i.toInt()]);
-      }
-    })
+
+      return (i >= 0 && i < chars.length) ?
+          StrValue(chars[i]) :
+          NullValue();
+    }),
+
+    'codepoint_at': (target) => NativeFnValue((args, __) async {
+			final value = target.cast<StrValue>().value;
+      final i = args.check<NumValue>(0).value.toInt();
+
+      return (i >= 0 && i < value.length) ?
+          NumValue(value.codeUnitAt(i)) :
+          NullValue();
+		}),
   },
 
   'arr': {
