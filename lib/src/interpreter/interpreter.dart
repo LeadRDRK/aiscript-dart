@@ -245,6 +245,7 @@ class Interpreter {
             node.attr.map((attr) async => Attribute(attr.name, await _eval(attr.value, scope)))
           );
         }
+        value.isMutable = node.mut;
         scope.add(node.name, value);
         return NullValue();
       
@@ -252,54 +253,21 @@ class Interpreter {
         return scope[node.name];
 
       case 'assign': node as AssignNode;
-        final v = await _eval(node.expr, scope);
         final dest = node.dest;
-        if (dest is IdentifierNode) {
-          scope.assign(dest.name, v);
-        }
-        else if (dest is IndexNode) {
-          final assignee = await _eval(dest.target, scope);
-          final index = await _eval(dest.index, scope);
-          
-          if (assignee is ArrValue) {
-            final i = index.cast<NumValue>().value.toInt();
-            final list = assignee.value;
-            if (i >= list.length) {
-              // Simulate javascript array behavior
-              var count = i - list.length;
-              for (var j = 0; j <= count; ++j) {
-                list.add(NullValue());
-              }
-            }
-            list[i] = v;
-          }
-          else if (assignee is ObjValue) {
-            final i = index.cast<StrValue>().value;
-            assignee.value[i] = v;
-          }
-          else {
-            throw RuntimeError(ctx, 'cannot read prop "$index" of ${assignee.type}');
-          }
-        }
-        else if (dest is PropNode) {
-          final assignee = (await _eval(dest.target, scope)).cast<ObjValue>();
-          assignee.value[dest.name] = v;
-        }
-        else {
-          throw RuntimeError(ctx, 'invalid left-hand side in assignment', ctx.getLineColumn(dest.loc));
-        }
+        final value = await _eval(node.expr, scope);
+        await _assign(scope, dest, value);
         return NullValue();
       
       case 'addAssign': node as AddAssignNode;
         final target = (await _eval(node.dest, scope)).cast<NumValue>();
         final v = (await _eval(node.expr, scope)).cast<NumValue>();
-        target.value += v.value;
+        await _assign(scope, node.dest, NumValue(target.value + v.value));
         return NullValue();
       
       case 'subAssign': node as SubAssignNode;
         final target = (await _eval(node.dest, scope)).cast<NumValue>();
         final v = (await _eval(node.expr, scope)).cast<NumValue>();
-        target.value -= v.value;
+        await _assign(scope, node.dest, NumValue(target.value - v.value));
         return NullValue();
       
       case 'null': node as NullNode;
@@ -430,6 +398,44 @@ class Interpreter {
     }
   }
 
+  Future<void> _assign(Scope scope, Node dest, Value value) async {
+    final ctx = currentContext;
+    if (dest is IdentifierNode) {
+      scope.assign(dest.name, value);
+    }
+    else if (dest is IndexNode) {
+      final assignee = await _eval(dest.target, scope);
+      final index = await _eval(dest.index, scope);
+      
+      if (assignee is ArrValue) {
+        final i = index.cast<NumValue>().value.toInt();
+        final list = assignee.value;
+        if (i >= list.length) {
+          // Simulate javascript array behavior
+          var count = i - list.length;
+          for (var j = 0; j <= count; ++j) {
+            list.add(NullValue());
+          }
+        }
+        list[i] = value;
+      }
+      else if (assignee is ObjValue) {
+        final i = index.cast<StrValue>().value;
+        assignee.value[i] = value;
+      }
+      else {
+        throw RuntimeError(ctx, 'cannot read prop "$index" of ${assignee.type}');
+      }
+    }
+    else if (dest is PropNode) {
+      final assignee = (await _eval(dest.target, scope)).cast<ObjValue>();
+      assignee.value[dest.name] = value;
+    }
+    else {
+      throw RuntimeError(ctx, 'invalid left-hand side in assignment', ctx.getLineColumn(dest.loc));
+    }
+  }
+
   Future<Value> _run(List<Node> script, Scope scope) async {
     Value v = NullValue();
 
@@ -470,13 +476,6 @@ class Interpreter {
     }
   }
 
-  Value _passArgValue(Value arg) {
-    if (arg is NumValue) {
-      return NumValue(arg.value);
-    }
-    return arg;
-  }
-
   /// Calls the function.
   /// 
   /// The optional [loc] value will be used for errors.
@@ -494,12 +493,11 @@ class Interpreter {
       _currentContext = context ?? Context(Scope.child(scope), source: source);
     }
 
-    final passedArgs = args.map((value) => _passArgValue(value));
     Value res;
     try {
       if (fn is NativeFnValue) {
         try {
-          res = await fn.nativeFn(FnArgs(passedArgs.toList()), this);
+          res = await fn.nativeFn(FnArgs(args), this);
         }
         on AiScriptError catch (e) {
           e.pos ??= currentContext.getLineColumn(loc);
@@ -510,7 +508,7 @@ class Interpreter {
         fn as NormalFnValue;
         final Map<String, Value> argVars = {};
         for (var i = 0; i < fn.params.length; ++i) {
-          argVars[fn.params[i]] = passedArgs.elementAtOrNull(i) ?? NullValue();
+          argVars[fn.params[i]] = args.elementAtOrNull(i) ?? NullValue();
         }
         final scope = Scope.child(fn.scope, argVars);
         res = await _run(fn.statements, scope);

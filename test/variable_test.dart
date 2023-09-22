@@ -20,6 +20,14 @@ void main() {
     expect(res, NumValue(42));
   });
 
+  test('let assign', () {
+    final ft = exec('''
+      let a = 42
+      a = 12
+    ''');
+    expect(() async => await ft, throwsA(TypeMatcher<RuntimeError>()));
+  });
+
   test('add assign', () async {
     final res = await exec('''
       var a = 0

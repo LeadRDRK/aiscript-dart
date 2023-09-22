@@ -37,7 +37,7 @@ class Scope extends MapBase<String, Value> {
 
   /// Adds a variable to the scope.
   /// 
-  /// Throws a [RuntimeError] if the variable already exists.
+  /// Throws a [VariableExistsException] if the variable already exists.
   void add(String key, Value value) {
     final layer = _layers[0];
     if (layer.containsKey(key)) {
@@ -48,8 +48,15 @@ class Scope extends MapBase<String, Value> {
 
   /// Assigns a new value to a variable.
   /// 
-  /// Throws a [RuntimeError] if the variable doesn't exist.
-  void assign(String key, Value value) => _firstLayerWithKey(key)[key] = value;
+  /// Throws a [NoSuchVariableException] if the variable doesn't exist,
+  /// [ImmutableVariableException] if the variable is immutable.
+  void assign(String key, Value value) {
+    final layer = _firstLayerWithKey(key);
+    if (layer[key]!.isMutable == false) {
+      throw ImmutableVariableException(this, key);
+    }
+    layer[key] = value;
+  }
 
   Map<String, Value> _firstLayerWithKey(String key) {
     Map<String, Value> layer;
@@ -101,4 +108,16 @@ class NoSuchVariableException extends ScopeException with VariableException {
 
   @override
   String toString() => 'No such variable "$key" in scope "${scope.name}"';
+}
+
+/// An exception that is thrown when attempting to assign a value to an immutable variable.
+class ImmutableVariableException extends ScopeException with VariableException {
+  ImmutableVariableException(Scope scope, this.key)
+  : super(scope);
+
+  @override
+  final String key;
+
+  @override
+  String toString() => 'Attempt to assign value to immutable variable "$key"';
 }

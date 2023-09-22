@@ -25,8 +25,10 @@ abstract class Value {
 
   /// The statement that this value was returned from.
   OriginStatement origin;
-  /// The value's attributes
+  /// The value's attributes.
   List<Attribute>? attributes;
+  /// Whether the value is mutable.
+  bool isMutable = true;
 
   /// Cast a Value to another Value type.
   /// 
@@ -124,7 +126,7 @@ class NumValue extends Value with PrimitiveValue<num> {
   String get type => 'num';
 
   @override
-  num value;
+  final num value;
 
   @override
   num toJson() => value;
