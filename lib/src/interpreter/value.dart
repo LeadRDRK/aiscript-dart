@@ -104,7 +104,7 @@ class NullValue extends Value with PrimitiveValue<Null> {
   void toJson() {}
 }
 
-/// An AiScript bool value.
+/// An AiScript boolean value.
 class BoolValue extends Value with PrimitiveValue<bool> {
   BoolValue(this.value, [OriginStatement origin = OriginStatement.none]) : super(origin);
 
@@ -118,7 +118,7 @@ class BoolValue extends Value with PrimitiveValue<bool> {
   bool toJson() => value;
 }
 
-/// An AiScript num value.
+/// An AiScript number value.
 class NumValue extends Value with PrimitiveValue<num> {
   NumValue(this.value, [OriginStatement origin = OriginStatement.none]) : super(origin);
 
@@ -132,7 +132,7 @@ class NumValue extends Value with PrimitiveValue<num> {
   num toJson() => value;
 }
 
-/// An AiScript str value.
+/// An AiScript string value.
 class StrValue extends Value with PrimitiveValue<String> {
   StrValue(this.value, [OriginStatement origin = OriginStatement.none]) : super(origin);
 
@@ -158,7 +158,7 @@ mixin DeepEqValue<T> on PrimitiveValue<T> {
   String toString([Set<DeepEqValue>? processed]);
 }
 
-/// An AiScript arr value.
+/// An AiScript array value.
 class ArrValue extends Value with PrimitiveValue<List<Value>>, DeepEqValue {
   ArrValue(this.value, [OriginStatement origin = OriginStatement.none]) : super(origin);
 
@@ -214,7 +214,7 @@ class ArrValue extends Value with PrimitiveValue<List<Value>>, DeepEqValue {
   }
 }
 
-/// An AiScript obj value.
+/// An AiScript object value.
 class ObjValue extends Value with PrimitiveValue<Map<String, Value>>, DeepEqValue {
   ObjValue(this.value, [OriginStatement origin = OriginStatement.none]) : super(origin);
 
@@ -270,7 +270,7 @@ class ObjValue extends Value with PrimitiveValue<Map<String, Value>>, DeepEqValu
   }
 }
 
-/// Base class for fn values.
+/// Base class for function values.
 abstract class FnValue extends Value {
   FnValue([origin = OriginStatement.none]) : super(origin);
 
@@ -291,7 +291,7 @@ abstract class FnValue extends Value {
   String toString() => '@( ${params != null ? params!.join(", ") : ""} ) { ... }';
 }
 
-/// A native fn value.
+/// A native function value.
 class NativeFnValue extends FnValue {
   NativeFnValue(this.nativeFn, [OriginStatement origin = OriginStatement.none]) : super(origin);
 
@@ -305,7 +305,7 @@ class NativeFnValue extends FnValue {
   List<Node>? get statements => null;
 }
 
-/// An AiScript fn value.
+/// An AiScript function value.
 class NormalFnValue extends FnValue {
   NormalFnValue(this.params, this.statements, this.scope, [OriginStatement origin = OriginStatement.none]) : super(origin);
 
