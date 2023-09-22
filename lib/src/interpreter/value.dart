@@ -320,3 +320,12 @@ class NormalFnValue extends FnValue {
 
   Scope scope;
 }
+
+class ErrorValue extends StrValue {
+  ErrorValue(String value, [this.info, OriginStatement origin = OriginStatement.none]) : super(value, origin);
+
+  @override
+  String get type => 'error';
+
+  Value? info;
+}

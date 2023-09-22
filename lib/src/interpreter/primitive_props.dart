@@ -212,6 +212,12 @@ final Map<String, Map<String, Value Function(Value)>> primitiveProps = {
 
       return target;
     })
+  },
+
+  'error': {
+    'name': (target) => StrValue(target.cast<ErrorValue>().value),
+
+    'info': (target) => target.cast<ErrorValue>().info ?? NullValue(),
   }
 };
 
