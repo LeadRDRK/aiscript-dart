@@ -4,6 +4,10 @@
 /// 
 /// We will be serializing variables marked with the "Serializable" attribute to a JSON object.
 /// The "Key" attribute can be used to customize the value's key in the object.
+/// 
+/// This example specifically makes use of AST traversal to access the attribute values.
+/// You can also access Value.attributes directly instead, but note that once you set a
+/// different value to a mutable variable, the attribute information will be lost.
 ///
 
 import 'dart:convert';
