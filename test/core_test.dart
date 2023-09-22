@@ -57,13 +57,49 @@ void main() {
     });
   });
 
-  group('location', () => {
+  group('location', () {
     test('function', () async {
       final parser = Parser();
       final nodes = parser.parse('@f(a) { a }').ast;
       expect(nodes.length, 1);
       final node = nodes[0];
       expect(node.loc, Loc(0, 10));
-    })
+    });
+  });
+
+  group('scope', () {
+    final scope = Scope([
+      {
+        'a': NullValue()
+      },
+      {
+        'a': NumValue(1),
+        'b': NumValue(2),
+        'c': NumValue(3)
+      }
+    ]);
+
+    test('keys', () {
+      expect(scope.keys, ['a', 'b', 'c']);
+    });
+
+    test('values', () {
+      expect(scope.values, [NullValue(), NumValue(2), NumValue(3)]);
+    });
+
+    test('isEmpty', () {
+      expect(scope.isEmpty, false);
+      expect(Scope([]).isEmpty, true);
+      expect(Scope([{}, {}]).isEmpty, true);
+    });
+
+    test('isNotEmpty', () {
+      expect(scope.isNotEmpty, true);
+    });
+
+    test('containsKey', () {
+      expect(scope.containsKey('c'), true);
+      expect(scope.containsKey('d'), false);
+    });
   });
 }

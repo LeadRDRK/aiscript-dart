@@ -17,7 +17,10 @@ class Scope extends MapBase<String, Value> {
   String name;
 
   @override
-  Value operator [](Object? key) => _firstLayerWithKey(key as String)[key]!;
+  Value? operator [](Object? key) {
+    final layer = _firstLayerWithKey(key as String);
+    return layer == null ? null : layer[key];
+  }
 
   /// Alias for assign.
   @override
@@ -27,10 +30,16 @@ class Scope extends MapBase<String, Value> {
   void clear() => _layers[0].clear();
 
   @override
-  Iterable<String> get keys => _layers.fold<List<String>>([], (value, element) => value..addAll(element.keys));
+  Iterable<String> get keys => _layers.fold<Set<String>>({}, (value, element) => value..addAll(element.keys));
 
   @override
-  Iterable<Value> get values => _layers.fold<List<Value>>([], (value, element) => value..addAll(element.values));
+  bool containsKey(Object? key) => _firstLayerWithKey(key as String) != null;
+
+  @override
+  bool get isEmpty => _layers.every((layer) => layer.isEmpty);
+
+  @override
+  bool get isNotEmpty => !isEmpty;
   
   @override
   Value? remove(Object? key) => _layers[0].remove(key);
@@ -49,29 +58,39 @@ class Scope extends MapBase<String, Value> {
     layer[key] = value;
   }
 
+  /// Gets a variable.
+  /// 
+  /// Throws a [NoSuchVariableException] if the variable doesn't exist.
+  /// Use the [] operator instead if you want it to return `null` instead
+  /// of throwing an exception.
+  Value get(String key) {
+    final layer = _firstLayerWithKey(key);
+    if (layer == null) {
+      throw NoSuchVariableException(this, key);
+    }
+    return layer[key]!;
+  }
+
   /// Assigns a new value to a variable.
   /// 
   /// Throws a [NoSuchVariableException] if the variable doesn't exist,
   /// [ImmutableVariableException] if the variable is immutable.
   void assign(String key, Value value) {
     final layer = _firstLayerWithKey(key);
+    if (layer == null) {
+      throw NoSuchVariableException(this, key);
+    }
     if (layer[key]!.isMutable == false) {
       throw ImmutableVariableException(this, key);
     }
     layer[key] = value;
   }
 
-  Map<String, Value> _firstLayerWithKey(String key) {
-    Map<String, Value> layer;
-
-    try {
-      layer = _layers.firstWhere((element) => element.containsKey(key));
+  Map<String, Value>? _firstLayerWithKey(String key) {
+    for (final layer in _layers) {
+      if (layer.containsKey(key)) return layer;
     }
-    catch (e) {
-      throw NoSuchVariableException(this, key);
-    }
-
-    return layer;
+    return null;
   }
 }
 

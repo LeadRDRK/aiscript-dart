@@ -77,7 +77,7 @@ let foo = "bar"
   final scope = state.scope;
   final Map<String, Value> json = {};
   serializableVars.forEach((key, varName) {
-    json[key] = scope[varName];
+    json[key] = scope.get(varName);
   });
 
   // Encode and print the result

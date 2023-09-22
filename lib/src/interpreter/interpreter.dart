@@ -250,7 +250,7 @@ class Interpreter {
         return NullValue();
       
       case 'identifier': node as IdentifierNode;
-        return scope[node.name];
+        return scope.get(node.name);
 
       case 'assign': node as AssignNode;
         final dest = node.dest;
