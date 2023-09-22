@@ -457,23 +457,35 @@ class Interpreter {
     }
   }
 
-  Future<void> _collectNsMember(NamespaceNode ns) async {
-    final nsScope = Scope.child(scope);
+  Future<Map<String, Value>> _collectNsMember(NamespaceNode ns, [Scope? scope, String nsPrefix = '']) async {
+    nsPrefix += '${ns.name}:';
+    final nsScope = Scope.child(scope ?? this.scope);
+    final ctx = currentContext;
 
     for (final node in ns.members) {
       if (node is DefinitionNode) {
+        if (node.mut) {
+          throw RuntimeError(ctx, 'namespaces cannot include mutable variable: '
+              '${node.name}', ctx.getLineColumn(node.loc));
+        }
+
         final v = await _eval(node.expr, nsScope);
+        v.isMutable = node.mut;
         nsScope.add(node.name, v);
-        scope.add('${ns.name}:${node.name}', v);
+        this.scope.add('$nsPrefix${node.name}', v);
       }
       else if (node is NamespaceNode) {
-        // TODO
+        final layer = await _collectNsMember(node, nsScope, nsPrefix);
+        layer.forEach((key, value) {
+          nsScope.add('${node.name}:$key', value);
+        });
       }
       else {
-        final ctx = currentContext;
         throw RuntimeError(ctx, 'invalid ns member type: ${node.type}', ctx.getLineColumn(node.loc));
       }
     }
+
+    return nsScope.top;
   }
 
   /// Calls the function.

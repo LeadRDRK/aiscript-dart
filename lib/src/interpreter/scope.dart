@@ -35,6 +35,9 @@ class Scope extends MapBase<String, Value> {
   @override
   Value? remove(Object? key) => _layers[0].remove(key);
 
+  /// The top layer of the scope.
+  Map<String, Value> get top => _layers[0];
+
   /// Adds a variable to the scope.
   /// 
   /// Throws a [VariableExistsException] if the variable already exists.
