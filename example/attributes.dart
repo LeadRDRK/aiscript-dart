@@ -4,14 +4,9 @@
 /// 
 /// We will be serializing variables marked with the "Serializable" attribute to a JSON object.
 /// The "Key" attribute can be used to customize the value's key in the object.
-/// 
-/// This example specifically makes use of AST traversal to access the attribute values.
-/// You can also access Value.attributes directly instead, but note that once you set a
-/// different value to a mutable variable, the attribute information will be lost.
 ///
 
 import 'dart:convert';
-
 import 'package:aiscript/aiscript.dart';
 
 void main() async {
@@ -33,51 +28,42 @@ let notSerialized = 456
 let foo = "bar"
 ''');
 
-  // Traverse the syntax tree to find the serializable variable definition nodes
-  final nodes = res.ast;
-  final Map<String, String> serializableVars = {};
-  for (final node in nodes) {
-    // Check node type and see if it has any attributes
-    if (node is! DefinitionNode || node.attr.isEmpty) continue;
+  // Create the interpreter state
+  final state = Interpreter({});
+  state.source = res.source;
+  // Create our own scope that inherits from the root scope so we can access the variables later
+  final scope = Scope.child(state.scope);
+  // Execute the script in the custom scope using a custom context
+  // Alternatively, you could also use [state.scope] directly, which would define the variables
+  // in the root scope.
+  await state.exec(res.ast, Context(scope));
+
+  // Get the values from the scope
+  // The Value classes are JSON serializable so no need for any extra processing
+  final Map<String, Value> json = {};
+  scope.forEach((name, value) {
+    final attributes = value.attributes;
+    if (attributes == null || attributes.isEmpty) return;
 
     var serializable = false;
-    var key = node.name; // Default to variable name
+    var key = name; // Default to variable name
 
-    for (final attr in node.attr) {
+    for (final attr in attributes) {
       switch (attr.name) {
         case 'Serializable':
           serializable = true;
           break;
 
         case 'Key': {
-          final strNode = attr.value;
-          if (strNode is! StrNode) {
-            print('Warning: invalid Key attribute');
-            break;
-          }
-          key = strNode.value;
+          // Assume that it's a string value
+          // You might want to handle invalid values in your actual code
+          key = attr.value.cast<StrValue>().value;
           break;
         }
       }
     }
 
-    if (serializable) {
-      // Store variable name so we could get its value later
-      serializableVars[key] = node.name;
-    }
-  }
-
-  // Create the interpreter state and execute the script to evaluate the values
-  final state = Interpreter({});
-  state.source = res.source;
-  await state.exec(nodes);
-
-  // Get the values from the global scope
-  // The Value classes are JSON serializable so no need for any extra processing
-  final scope = state.scope;
-  final Map<String, Value> json = {};
-  serializableVars.forEach((key, varName) {
-    json[key] = scope.get(varName);
+    if (serializable) json[key] = value;
   });
 
   // Encode and print the result
