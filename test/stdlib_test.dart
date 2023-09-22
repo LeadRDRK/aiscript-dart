@@ -174,17 +174,15 @@ void main() {
     });
 
     test('gen_rng', () async {
-      // Test will occasionally fail (1 in 10000 chance?)
-      // Because it's random.
       final res = await exec('''
         @test(seed) {
           let random = Math:gen_rng(seed)
           return random(0 100)
         }
-        let seed1 = `{Util:uuid()}`
-        let seed2 = `{Date:year()}`
+        let seed1 = "hoge"
+        let seed2 = 123
         let test1 = test(seed1) == test(seed1)
-        let test2 = test(seed1) == test(seed2) // fails sometimes
+        let test2 = test(seed1) == test(seed2)
         <: [test1 test2]
       ''');
       expect(res, HasValue([BoolValue(true), BoolValue(false)]));
