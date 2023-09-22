@@ -76,6 +76,7 @@ class AiScriptGrammarDefinition extends GrammarDefinition {
   Parser expr3() =>
       ref0(match) |       // "match"
       ref0(eval) |        // "eval"
+      ref0(exists) |      // "exists"
       ref0(tmpl) |        // "`"
       ref0(str) |         // "\""
       ref0(num_) |        // "+" | "-" | "1"~"9"
@@ -270,6 +271,9 @@ class AiScriptGrammarDefinition extends GrammarDefinition {
   // Eval expression
   Parser eval() => string('eval') &
       ref1(_trim, '{') & ref0(statements) & char('}').skip(before: ref0(whitespace).star());
+  
+  // Exists expression
+  Parser exists() => string('exists') & ref0(identifier).skip(before: ref0(whitespace).plus());
   
   // Identifier
   Parser identifier() => ref0(nameWithNamespace).flatten('identifier expected');

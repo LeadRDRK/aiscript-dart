@@ -323,6 +323,14 @@ class AiScriptParserDefinition extends AiScriptGrammarDefinition {
   );
 
   @override
+  Parser exists() => super.exists().token().map((token) =>
+    ExistsNode(
+      identifier: token.value[1] as IdentifierNode,
+      loc: Loc.fromToken(token)
+    )
+  );
+
+  @override
   Parser identifier() => super.identifier().token().map((token) =>
     IdentifierNode(
       name: token.value as String,

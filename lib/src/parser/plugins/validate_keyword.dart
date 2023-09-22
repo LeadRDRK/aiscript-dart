@@ -17,6 +17,7 @@ const _reservedWords = {
   'eval',
   'var',
   'let',
+  'exists',
 
   // future
   'fn',

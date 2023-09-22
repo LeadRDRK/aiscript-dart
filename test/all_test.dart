@@ -6,6 +6,7 @@ import 'chain_test.dart' as chain_test;
 import 'comment_test.dart' as comment_test;
 import 'core_test.dart' as core_test;
 import 'each_test.dart' as each_test;
+import 'exists_test.dart' as exists_test;
 import 'extra_test.dart' as extra_test;
 import 'for_test.dart' as for_test;
 import 'function_test.dart' as function_test;
@@ -33,6 +34,7 @@ void main() {
   group('comment', comment_test.main);
   group('core', core_test.main);
   group('each', each_test.main);
+  group('exists', exists_test.main);
   group('extra', extra_test.main);
   group('for', for_test.main);
   group('function', function_test.main);

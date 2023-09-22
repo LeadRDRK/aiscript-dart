@@ -335,6 +335,9 @@ class Interpreter {
       case 'block': node as BlockNode;
         return _run(node.statements, Scope.child(scope));
       
+      case 'exists': node as ExistsNode;
+        return BoolValue(scope.containsKey(node.identifier.name));
+
       case 'tmpl': node as TmplNode;
         var str = '';
         for (final x in node.tmpl) {

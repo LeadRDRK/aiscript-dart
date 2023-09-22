@@ -344,6 +344,20 @@ class BlockNode extends Node {
   }
 }
 
+class ExistsNode extends Node {
+  ExistsNode({required this.identifier, Loc? loc}) : super(loc);
+
+  @override
+  String get type => 'exists';
+
+  IdentifierNode identifier;
+
+  @override
+  void accept(Visitor fn) {
+    identifier = identifier.visit(fn) as IdentifierNode;
+  }
+}
+
 class TmplNode extends Node {
   TmplNode({required this.tmpl, Loc? loc}) : super(loc);
 
