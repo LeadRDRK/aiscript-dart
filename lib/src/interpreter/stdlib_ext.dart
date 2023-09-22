@@ -9,8 +9,7 @@ final Map<String, Value> stdlibExt = {
 
     // Resolve the module's path
     final currentContext = state.currentContext;
-    String? currentPath = currentContext.moduleName == null ? null :
-        _getCurrentModulePath(currentContext.scope);
+    String? currentPath = currentContext.modulePath;
     
     final path = await state.moduleResolver.resolvePath(name, currentPath);
     if (path == null) {
@@ -48,17 +47,6 @@ final Map<String, Value> stdlibExt = {
     return module;
   })
 };
-
-String? _getCurrentModulePath(Scope scope) {
-  final meta = scope['__module'];
-  if (meta is ObjValue) {
-    final path = meta.value['path'];
-    if (path is StrValue) {
-      return path.value;
-    }
-  }
-  return null;
-}
 
 String _formatModuleName(Context ctx) =>
     ctx.moduleName == null ? '<script>' : '"${ctx.moduleName}"';
