@@ -145,4 +145,13 @@ void main() {
     ''');
     expect(res, NumValue(45));
   });
+
+  test('object with index', () async {
+    final res = await exec('''
+      let ai = {a: {}}['a']
+      ai['chan'] = 'kawaii'
+      <: ai[{a: 'chan'}['a']]
+    ''');
+    expect(res, StrValue('kawaii'));
+  });
 }

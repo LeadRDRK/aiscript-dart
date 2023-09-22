@@ -258,18 +258,28 @@ class Interpreter {
           scope.assign(dest.name, v);
         }
         else if (dest is IndexNode) {
-          final assignee = (await _eval(dest.target, scope)).cast<ArrValue>();
-          final i = (await _eval(dest.index, scope)).cast<NumValue>().value.toInt();
-
-          final list = assignee.value;
-          if (i >= list.length) {
-            // Simulate javascript array behavior
-            var count = i - list.length;
-            for (var j = 0; j <= count; ++j) {
-              list.add(NullValue());
+          final assignee = await _eval(dest.target, scope);
+          final index = await _eval(dest.index, scope);
+          
+          if (assignee is ArrValue) {
+            final i = index.cast<NumValue>().value.toInt();
+            final list = assignee.value;
+            if (i >= list.length) {
+              // Simulate javascript array behavior
+              var count = i - list.length;
+              for (var j = 0; j <= count; ++j) {
+                list.add(NullValue());
+              }
             }
+            list[i] = v;
           }
-          list[i] = v;
+          else if (assignee is ObjValue) {
+            final i = index.cast<StrValue>().value;
+            assignee.value[i] = v;
+          }
+          else {
+            throw RuntimeError(ctx, 'cannot read prop "$index" of ${assignee.type}');
+          }
         }
         else if (dest is PropNode) {
           final assignee = (await _eval(dest.target, scope)).cast<ObjValue>();
@@ -329,13 +339,23 @@ class Interpreter {
         }
       
       case 'index': node as IndexNode;
-        final target = (await _eval(node.target, scope)).cast<ArrValue>();
-        final i = (await _eval(node.index, scope)).cast<NumValue>();
-        final item = target.value.elementAtOrNull(i.value.toInt());
-        if (item == null) {
-          throw IndexOutOfRangeError(ctx, i.value.toInt(), target.value.length);
+        final target = await _eval(node.target, scope);
+        final index = await _eval(node.index, scope);
+        if (target is ArrValue) {
+          final i = index.cast<NumValue>().value.toInt();
+          final item = target.value.elementAtOrNull(i);
+          if (item == null) {
+            throw IndexOutOfRangeError(ctx, i, target.value.length);
+          }
+          return item;
         }
-        return item;
+        else if (target is ObjValue) {
+          final i = index.cast<StrValue>().value;
+          return target.value[i] ?? NullValue();
+        }
+        else {
+          throw RuntimeError(ctx, 'cannot read prop "$index" of ${target.type}');
+        }
       
       case 'not': node as NotNode;
         final v = (await _eval(node.expr, scope)).cast<BoolValue>();
