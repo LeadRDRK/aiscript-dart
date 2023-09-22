@@ -327,5 +327,14 @@ class ErrorValue extends StrValue {
   @override
   String get type => 'error';
 
+  @override
+  bool operator ==(Object other) =>
+      super == other &&
+      other is ErrorValue &&
+      other.info == info;
+  
+  @override
+  int get hashCode => Object.hash(super.hashCode, info);
+
   Value? info;
 }

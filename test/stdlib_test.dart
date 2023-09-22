@@ -252,16 +252,25 @@ void main() {
       expect(res, StrValue('{"a":"hoge","b":21,"c":true,"arr":[1,2,3],"fn":"<function>"}'));
     });
 
-    test('parse', () async {
-      final res = await exec('''
-        <: Json:parse('{"a":"hoge","b":21,"c":true,"arr":[1,2,3]}')
-      ''');
-      expect(res, HasValue({
-        'a': StrValue('hoge'),
-        'b': NumValue(21),
-        'c': BoolValue(true),
-        'arr': HasValue([NumValue(1), NumValue(2), NumValue(3)])
-      }));
+    group('parse', () {
+      test('valid', () async {
+        final res = await exec('''
+          <: Json:parse('{"a":"hoge","b":21,"c":true,"arr":[1,2,3]}')
+        ''');
+        expect(res, HasValue({
+          'a': StrValue('hoge'),
+          'b': NumValue(21),
+          'c': BoolValue(true),
+          'arr': HasValue([NumValue(1), NumValue(2), NumValue(3)])
+        }));
+      });
+
+      test('invalid', () async {
+        final res = await exec('''
+          <: Json:parse('hoge')
+        ''');
+        expect(res, ErrorValue('not_json'));
+      });
     });
 
     test('parsable', () async {

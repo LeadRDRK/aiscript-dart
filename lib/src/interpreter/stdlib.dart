@@ -188,7 +188,12 @@ final Map<String, Value> stdlib = {
 
   'Json:parse': NativeFnValue((args, __) async {
     final json = args.check<StrValue>(0);
-    return Value.fromJson(jsonDecode(json.value));
+    try {
+      return Value.fromJson(jsonDecode(json.value));
+    }
+    catch (e) {
+      return ErrorValue('not_json');
+    }
   }),
 
   'Json:parsable': NativeFnValue((args, __) async {
