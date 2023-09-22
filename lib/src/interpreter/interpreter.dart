@@ -346,14 +346,7 @@ class Interpreter {
           }
           else if (x is Node) {
             final v = await _eval(x, scope);
-            String vStr = '';
-            if (v is StrValue) {
-              vStr = v.value;
-            }
-            else if (v is NumValue) {
-              vStr = v.value.toString();
-            }
-            str += vStr;
+            str += v.toString();
           }
         }
         return StrValue(str);

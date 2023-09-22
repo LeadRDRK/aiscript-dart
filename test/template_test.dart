@@ -29,4 +29,12 @@ void main() {
     ''');
     expect(res, StrValue('`a{b}c`'));
   });
+
+  test('array', () async {
+    final res = await exec('''
+      let arr = [1, 2, 3]
+      <: `a{arr}b`
+    ''');
+    expect(res, StrValue('a[ 1, 2, 3 ]b'));
+  });
 }
